@@ -76,7 +76,6 @@ private:
   RealSpaceGridHandler _realSGH;
   PhaseSpaceGridHandler _phaseSGH;
   FermiDistrGraphene _fermiDistr;
-  double _Efhd;
   DiffusionSolver1D _bltElectron, _bltHole;
   Field _Ex;
   Concentration _SigmaElectron, _SigmaHole, _Sigma0xi;
@@ -85,12 +84,12 @@ private:
 
   OutputDirectoryManager _odm;
   std::string _SSDir, _concDir, _pot2DDir, _fieldDir, _velDir;
-  /*
-  double _calcEfHeavilyDoped(double Sigma0hd, bool toAccountHole);
+
   void _setDopingProfile();
   void _initPoissonSolver();
+
+  /*
   void _refineMesh();
-  void _addInitialPerturbation();
   void _setInitialSteadyStateLocalFermi();
   void _setInitialSteadyStateSCFFermi(double rVg=1.0,
 				      double rVgPrev=-1.0);

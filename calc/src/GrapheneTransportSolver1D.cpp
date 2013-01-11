@@ -33,6 +33,23 @@ GrapheneTransportSolver1D(const PoissonSolver2DDescriptor &poiDsc,
 */
   _nSteps(0), _odm(odm)
 {
+
+  // Check the validity of descriptors.
+
+  if( _poiDsc.getTypeBCLeft() != PoissonSolver2DBC::BCPeriodic ){
+    cerr << "GrapheneTransportSolver1D::GrapheneTransportSolver1D: ";
+    cerr << "BCs must be periodic for Poisson." << endl;
+    exit(1);
+  }
+
+  if( fabs(_poiDsc.getL()-_difDsc.getLc()) > nm2m(0.01) ){
+    cerr << "GrapheneTransportSolver1D::GrapheneTransportSolver1D: ";
+    cerr << "channel lengths for Poisson and Diffusion are ";
+    cerr << "different." << endl;
+    exit(1);
+  }
+
+
   /*
   _setDopingProfile();
   _initPoissonSolver();
@@ -84,20 +101,14 @@ _calcEfHeavilyDoped(double Sigma0hd, bool toAccountHole)
 */
 
 /*
- * Solve the Boltzmann equation for the next time step.
+ * Solve the Diffusion equation for the next time step.
  */
 
 void GrapheneTransportSolver1D::solveStep()
 {
-  // Add the perturbation.
   /*
   double t = getTime();
   double dt = _gridParam.get_dt();
-  int nPerturb = (int)round(_bltDsc.get_tPerturb()/dt);
-
-  if(_nSteps == nPerturb){
-    _addInitialPerturbation();
-  }
 
 
   // Iteration of updates.
