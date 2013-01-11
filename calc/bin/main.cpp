@@ -1,5 +1,5 @@
 #include "DiffusionSolver1DDescriptor.h"
-//#include "GrapheneTransportSolver1D.h"
+#include "GrapheneTransportSolver1D.h"
 #include <PhysicalUnits.h>
 #include <Transistor2D/PoissonSolver2DDescriptor.h>
 #include <OutputDirectoryManager/OutputDirectoryManager.h>
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
   // Initialize the solver.
 
   const double dt = difDsc.get_dt();
-  //GrapheneTransportSolver1D solver(poiDsc, difDsc, odm);
+  GrapheneTransportSolver1D solver(poiDsc, difDsc, odm);
 
 
   // Time step.
