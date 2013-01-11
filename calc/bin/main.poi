@@ -1,0 +1,34 @@
+Interior {
+  L 3000
+  Wu1 2000
+  Wd1 2000
+  epsilon_u1 4
+  epsilon_d1 4
+}
+
+LeftRightBoundary {
+  typeBCLeft Periodic
+  typeBCRight Periodic
+}
+
+Gate {
+  Ng 2
+  Vg 50 -50
+  Lg 1000
+  Wg 1000
+  tg 10
+  sg 500
+}
+
+BottomGate {
+  bottomNg 2
+  bottomVg 50 -50
+  bottomLg 1000
+  bottomWg 1000
+  bottom_tg 10
+  bottom_sg 500
+}
+
+LowerBoundary {
+  isBackgated false
+}

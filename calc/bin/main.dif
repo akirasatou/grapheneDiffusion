@@ -1,0 +1,19 @@
+Mesh {
+  Nx 800
+  dt 0.1
+}
+
+Simulation {
+  Sigma0 0.0
+  Lc 3000
+  T 300
+  alpha 10
+  tMax 10000
+}
+
+Output {
+  tOutputStep 100
+  tOutputBinStep 10
+  toOutputSS true
+  toOutputConcentration true
+}

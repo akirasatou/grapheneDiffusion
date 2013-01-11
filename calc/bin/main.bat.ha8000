@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#@$-q debug
+#@$-N 1
+#@$-J T16
+#@$-lT 0:05:00
+#@$-e main.err
+#@$-o main.out
+#@$-mu a-satou@riec.tohoku.ac.jp
+
+source /opt/itc/mpi/mpiswitch.sh mpich-mx-intel11
+source /opt/intel/mkl/10.1.0.015/tools/environment/mklvarsem64t.sh
+cd /home/p11058/res/grapheneDiffusion/calc/bin
+OMP_NUM_THREADS=1
+
+difFileNoExt=main
+difFile=main.dif
+poiFileNoExt=main
+poiFile=main.poi
+
+~/lib/resutils/bin/geo2msh ${poiFileNoExt}
+
+mpirun -np 16 ./main ${poiFileNoExt} ${difFileNoExt} -ksp_type preonly -pc_type lu -pc_factor_zeropivot 0
