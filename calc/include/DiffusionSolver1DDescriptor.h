@@ -4,8 +4,6 @@
 #include <sstream>
 #include <SystemDescriptor/SystemDescriptor.h>
 
-using namespace std;
-
 
 /*
  * Class reading and holding the parameters.
@@ -18,9 +16,9 @@ class DiffusionSolver1DDescriptor
 
  public:
 
-  DiffusionSolver1DDescriptor(const string &fileHead);
+  DiffusionSolver1DDescriptor(const std::string &fileHead);
 
-  inline const string getFileHeadStr() const { return _fileHeadStr; }
+  inline const std::string getFileHeadStr() const { return _fileHeadStr; }
 
   inline int getNx() const { return _Nx; }
   inline double get_dt() const { return _dt; }
@@ -43,10 +41,10 @@ class DiffusionSolver1DDescriptor
 
  private:
 
-  static const string className;
+  static const std::string className;
 
   SystemDescriptor _sysDsc;
-  string _fileHeadStr, _className;
+  std::string _fileHeadStr, _className;
   void _readDsc();
 
   int _Nx;

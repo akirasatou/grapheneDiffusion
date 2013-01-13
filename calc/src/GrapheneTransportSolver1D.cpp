@@ -18,16 +18,12 @@ GrapheneTransportSolver1D(const PoissonSolver2DDescriptor &poiDsc,
 			  const DiffusionSolver1DDescriptor &difDsc,
 			  const OutputDirectoryManager &odm):
   _poiDsc(poiDsc), _difDsc(difDsc), _poisson(poiDsc),
+  _diffusion(_difDsc, _poisson, _poiDsc.getXlPoisson(), _poiDsc.getXrPoisson()),
+  _realSGH(_diffusion.getRealSGH()),
 /*
   _gridParam(_bltDsc.getNx(), _bltDsc.getNeps(), _bltDsc.getNtheta(),
 	     _bltDsc.get_dt(), MPI::COMM_WORLD),
-  _realSGH(_bltDsc.getNx(), _poiDsc.getXlPoisson(), _poiDsc.getL(),
-	   _bltDsc.getLc()),
-  _phaseSGH(_gridParam), _fermiDistr(_phaseSGH, _bltDsc.getT()),
   _Efhd(_calcEfHeavilyDoped(_bltDsc.getSigma0hd(), _bltDsc.toAccountHole())),
-  _bltElectron(-1, bltDsc, _gridParam, _realSGH, _phaseSGH, _Efhd),
-  _bltHole(+1, bltDsc, _gridParam, _realSGH, _phaseSGH, _Efhd,
-	   !_bltDsc.toAccountHole()),
   _Ex(_realSGH), _SigmaElectron(_realSGH), _SigmaHole(_realSGH),
   _Sigma0xi(_realSGH),
 */
@@ -51,7 +47,6 @@ GrapheneTransportSolver1D(const PoissonSolver2DDescriptor &poiDsc,
 
 
   /*
-  _setDopingProfile();
   _initPoissonSolver();
   */
 
@@ -74,21 +69,12 @@ GrapheneTransportSolver1D(const PoissonSolver2DDescriptor &poiDsc,
   }
 
 
-  // Initial distribution before WENO.
-  /*
-  if(_bltDsc.getInitDistrModel() == LocalSS){
-    _setInitialSteadyStateLocalFermi();
-  }
-  else if(_bltDsc.getInitDistrModel() == SCFSS){
-    _setInitialSteadyStateSCFFermiNewton();
-  }
-  else {
-    cerr << "GrapheneTransportSolver1D::GrapheneTransportSolver1D: ";
-    cerr << "Invalid InitDistrModel." << endl;
-    exit(1);
-  }
-  */
+  // Initial SCF distribution.
+
+  //_setInitialSteadyStateSCF();
+
 }
+
 /*
 double GrapheneTransportSolver1D::
 _calcEfHeavilyDoped(double Sigma0hd, bool toAccountHole)
@@ -101,7 +87,7 @@ _calcEfHeavilyDoped(double Sigma0hd, bool toAccountHole)
 */
 
 /*
- * Solve the Diffusion equation for the next time step.
+ * Solve the diffusion equation for the next time step.
  */
 
 void GrapheneTransportSolver1D::solveStep()
@@ -128,10 +114,11 @@ void GrapheneTransportSolver1D::solveStep()
     _bltElectron.update(num, _Ex);
     _bltHole.update(num, _Ex);
   }
+  */
 
 
   // Output.
-
+  /*
   int n_output_step = (int)round(_bltDsc.get_tOutputStep()/dt);
   int n_outputBin_step = (int)round(_bltDsc.get_tOutputBinStep()/dt);
   char filehead[300];
@@ -160,30 +147,6 @@ void GrapheneTransportSolver1D::solveStep()
       sprintf(filehead, "vel-t=%04.0ffs", s2fs(t));
       outputVelocity(_velDir.c_str(), filehead);
     }
-
-    const int nrRefPoints = 5;
-    int nx = getNx();
-    int refPoints[nrRefPoints] = {0, nx/8, nx/4, 3*nx/8, nx/2};
-    
-    for(int i=0; i<nrRefPoints; i++){
-      if( _bltDsc.toOutputDistribution() ){
-	sprintf(filehead, "distrDOS-t=%04.0ffs-i=%d", s2fs(t), refPoints[i]);
-	outputDistrDOSAt(_distrDir.c_str(), filehead, refPoints[i]);
-	
-	sprintf(filehead, "distr-t=%04.0ffs-i=%d", s2fs(t), refPoints[i]);
-	outputDistrAt(_distrDir.c_str(), filehead, refPoints[i]);
-      }
-      if( _bltDsc.toOutputJ() ){
-	sprintf(filehead, "Jacp-t=%04.0ffs-i=%d", s2fs(t), refPoints[i]);
-	outputJacpAt(_JacpDir.c_str(), filehead, refPoints[i]);
-	
-	sprintf(filehead, "Jdl-t=%04.0ffs-i=%d", s2fs(t), refPoints[i]);
-	outputJdlAt(_JdlDir.c_str(), filehead, refPoints[i]);
-	
-	sprintf(filehead, "Jds-t=%04.0ffs-i=%d", s2fs(t), refPoints[i]);
-	outputJdsAt(_JdsDir.c_str(), filehead, refPoints[i]);
-      }
-    }
   }
 
   MPI_Barrier(_gridParam.getWorld());
@@ -201,8 +164,7 @@ void GrapheneTransportSolver1D::solveStep()
 
 double GrapheneTransportSolver1D::getTime() const
 {
-  return 0.0;
-  //return _nSteps*_gridParam.get_dt();
+  return _nSteps*_difDsc.get_dt();
 }
 
 

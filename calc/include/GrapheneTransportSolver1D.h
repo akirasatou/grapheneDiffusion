@@ -1,11 +1,11 @@
 #pragma once
-#include "DiffusionSolver1DDescriptor.h"
-/*
+
 #include "DiffusionSolver1D.h"
+#include "RealSpaceGridHandler.h"
+/*
 #include "Field.h"
 #include "Concentration.h"
 #include "Potential.h"
-#include "RealSpaceGridHandler.h"
 #include "PhaseSpaceGridHandler.h"
 #include "FermiDistrGraphene.h"
 */
@@ -14,8 +14,6 @@
 #include <Transistor2D/PoissonSolver2D.h>
 #include <OutputDirectoryManager/OutputDirectoryManager.h>
 //#include "GridParameter.h"
-
-using namespace std;
 
 
 /*
@@ -71,12 +69,13 @@ private:
   const PoissonSolver2DDescriptor &_poiDsc;
   const DiffusionSolver1DDescriptor &_difDsc;
   PoissonSolver2D _poisson;
+  DiffusionSolver1D _diffusion;
+  RealSpaceGridHandler _realSGH;
+
   /*
   GridParameter _gridParam;
-  RealSpaceGridHandler _realSGH;
-  PhaseSpaceGridHandler _phaseSGH;
+
   FermiDistrGraphene _fermiDistr;
-  DiffusionSolver1D _bltElectron, _bltHole;
   Field _Ex;
   Concentration _SigmaElectron, _SigmaHole, _Sigma0xi;
   */
@@ -85,16 +84,15 @@ private:
   OutputDirectoryManager _odm;
   std::string _SSDir, _concDir, _pot2DDir, _fieldDir, _velDir;
 
-  void _setDopingProfile();
   void _initPoissonSolver();
+  //void _setInitialSteadyStateSCF();
+  //void _refineMeshSS(int nrNodesMax, bool toOutputMesh);
 
   /*
   void _refineMesh();
   void _setInitialSteadyStateLocalFermi();
   void _setInitialSteadyStateSCFFermi(double rVg=1.0,
 				      double rVgPrev=-1.0);
-  void _setInitialSteadyStateSCFFermiNewton();
-
   void _updateConcentrations(Concentration &se, Concentration &sh, 
 			     Concentration &sePrev,
 			     Concentration &shPrev,
@@ -110,6 +108,5 @@ private:
 				  const Concentration &Sigma0);
   void _calcInitialGuess(Concentration &se, Concentration &sh,
 			 double Ef0) const;
-  void _refineMeshSS(int nrNodesMax, bool toOutputMesh);
   */
 };
