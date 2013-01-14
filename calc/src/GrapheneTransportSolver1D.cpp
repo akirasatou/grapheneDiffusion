@@ -46,10 +46,6 @@ GrapheneTransportSolver1D(const PoissonSolver2DDescriptor &poiDsc,
   }
 
 
-  /*
-  _initPoissonSolver();
-  */
-
   // Create directories for output.
 
   if( _difDsc.toOutputSS() ){
@@ -67,6 +63,11 @@ GrapheneTransportSolver1D(const PoissonSolver2DDescriptor &poiDsc,
   if( _difDsc.toOutputVelocity() ){
     _odm.push(string("velocity")); _velDir = _odm.pop();
   }
+
+
+  // Initialize PoissonSolver.
+
+  _initPoissonSolver();
 
 
   // Initial SCF distribution.

@@ -54,7 +54,7 @@ int RealSpaceGridHandler::getSize() const
   return _x.size();
 }
 
-double RealSpaceGridHandler::getX(int i) const
+double RealSpaceGridHandler::getAt(int i) const
 {
   if( i<0 || i>=_x.size() ){
     cerr << "RealSpaceGridHandler::getX: index out of range: ";
@@ -63,6 +63,20 @@ double RealSpaceGridHandler::getX(int i) const
   }
 
   return _x[i];
+}
+
+void RealSpaceGridHandler::setAt(int i, double val)
+{
+  cerr << "RealSpaceGridHandler::setAt: do not modify the grid ";
+  cerr << "from outside." << endl;
+  exit(1);
+}
+
+void RealSpaceGridHandler::addAt(int i, double val)
+{
+  cerr << "RealSpaceGridHandler::setAt: do not modify the grid ";
+  cerr << "from outside." << endl;
+  exit(1);
 }
 
 pair<int, int> RealSpaceGridHandler::getPointID(int i) const
