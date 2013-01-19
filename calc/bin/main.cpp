@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
   int n_max = (int)ceil(t_max/dt);
 
   for(int n=0; n<=n_max; n++){
-    //solver.solveStep();
+    solver.solveStep();
   }
 
   return 0;

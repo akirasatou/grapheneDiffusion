@@ -2,6 +2,7 @@
 #include <mesh_generation.h>
 #include <edge_edge3.h>
 #include <nonlinear_implicit_system.h>
+#include <nonlinear_solver.h>
 #include <transient_system.h>
 #include <periodic_boundaries.h>
 #include <dof_map.h>
@@ -35,10 +36,11 @@ DiffusionSolver1D(const DiffusionSolver1DDescriptor &difDsc,
 		  PoissonSolver2D &poisson, double xl, double xr):
   _sysName(difDsc.getFileHeadStr()), _mesh(1), _es(_mesh),
   //_mRef(_mesh),
-  _difDsc(difDsc), _poisson(poisson), _Xl(xl), _Xr(xr), _nrSteps(0)
+  _difDsc(difDsc), _poisson(poisson), _rj(difDsc, poisson),
+  _Xl(xl), _Xr(xr), _nrSteps(0)
 {
 
-  // Generate a uniform mesh. Each element has 3 points.
+  // Generate a uniform mesh. Each element has 3 interior points.
 
   MeshTools::Generation::build_line(_mesh, _difDsc.getNx()/3,
 				    _Xl, _Xr, EDGE3);
@@ -58,6 +60,9 @@ DiffusionSolver1D(const DiffusionSolver1DDescriptor &difDsc,
 
 
   // Set residual_and_jacobian_object.
+
+  sys.nonlinear_solver->residual_object = &_rj;
+  sys.nonlinear_solver->jacobian_object = &_rj;
 
   
   // Initialize the equation systems.
@@ -88,11 +93,6 @@ DiffusionSolver1D(const DiffusionSolver1DDescriptor &difDsc,
   _es.parameters.set<Real>("dt") = _difDsc.get_dt();
   _es.parameters.set<Real>("nonlinear solver relative step tolerance") = 1e-5;
   _es.parameters.set<unsigned int>("nonlinear solver maximum iterations") = 100;
-
-
-  // Delayed init of SystemAssembler.
-
-
 
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "DiffusionSolver1DDescriptor.h"
 #include "RealSpaceGridHandler.h"
+#include "ResidualAndJacobianDiffusion.h"
 #include <Transistor2D/PoissonSolver2D.h>
 #include <libmesh.h>
 #include <mesh.h>
@@ -35,6 +36,7 @@ private:
   //MeshRefinement _mRef;
   const DiffusionSolver1DDescriptor &_difDsc;
   PoissonSolver2D &_poisson;
+  ResidualAndJacobianDiffusion _rj;
   double _Xl, _Xr;
   int _nrSteps;
 

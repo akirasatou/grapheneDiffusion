@@ -12,10 +12,15 @@ using namespace std;
 RealSpaceArrayDiffusion::
 RealSpaceArrayDiffusion(const RealSpaceGridHandler &realSGH):
   RealSpaceArrayWithVector<double>(realSGH.getSize()),
-  _x(realSGH.getSize()),
-  _realSGH(realSGH), _csi(&_a[0], &_x[0], _realSGH.getSize())
+  _x(realSGH.getSize()), _realSGH(realSGH)
 {
-  for(int i=0; i<_x.size(); i++) _x[i] = _realSGH.getAt(i);
+  for(int i=0; i<_x.size(); i++){
+    _x[i] = _realSGH.getAt(i);
+    _a[i] = 0.0;
+  }
+
+  _csi = WeightedCubicSplineInterpolator(&_a[0], &_x[0],
+					 _realSGH.getSize());
 }
 
 

@@ -14,21 +14,7 @@ void GrapheneTransportSolver1D::
 outputPotential(const char *dname, const char *fhead,
 		bool toOutputMesh, const string &format) const
 {
-  /*
-  if(_bltDsc.getFieldModel() == SCF){
-    _poisson.outputPotential2D(dname, fhead, toOutputMesh, format);
-  }
-  else if(_bltDsc.getFieldModel() == GCA){
-    char filename[1000];
-
-    sprintf(filename, "%s/%s.dat", dname, fhead);
-
-    FILE *fp = fopen(filename, "w");
-
-    fprintf(fp, "FieldModelGCA does not have 2D potential.\n");
-    fclose(fp);
-  }
-  */
+  _poisson.outputPotential2D(dname, fhead, toOutputMesh, format);
 }
 
 
@@ -40,7 +26,6 @@ outputPotential(const char *dname, const char *fhead,
 void GrapheneTransportSolver1D::
 outputConcentration2DEG(const char *dname, const char *fhead) const
 {
-  /*
   //if( !_gridParam.isOutputProc() ) return;
 
   FILE *fp;
@@ -49,34 +34,29 @@ outputConcentration2DEG(const char *dname, const char *fhead) const
   sprintf(filename, "%s/%s-e.dat", dname, fhead);
   fp = fopen(filename, "w");
 
-  for(int i=0; i<_realSGH.getSizeBlt(); i++){
-    fprintf(fp, "%g %.15e\n", _realSGH.getXiBlt(i),
-	    _SigmaElectron.getAtBlt(i));
+  for(int i=0; i<_realSGH.getSize(); i++){
+    fprintf(fp, "%g %g\n", _realSGH.getAt(i),
+	    _SigmaElectron.getAt(i));
   }
 
   fclose(fp);
 
-  if( _bltDsc.toAccountHole() ){
-    sprintf(filename, "%s/%s-h.dat", dname, fhead);
-    fp = fopen(filename, "w");
+  sprintf(filename, "%s/%s-h.dat", dname, fhead);
+  fp = fopen(filename, "w");
     
-    for(int i=0; i<_realSGH.getSizeBlt(); i++){
-      fprintf(fp, "%g %g\n", _realSGH.getXiBlt(i),
-	      _SigmaHole.getAtBlt(i));
-    }
-    
-    fclose(fp);
+  for(int i=0; i<_realSGH.getSize(); i++){
+    fprintf(fp, "%g %g\n", _realSGH.getAt(i), _SigmaHole.getAt(i));
   }
-  */
+  
+  fclose(fp);
 }
 
-/*
 void GrapheneTransportSolver1D::
 outputConcentration2DEG(const char *dname, const char *fhead,
-			const Concentration &se,
-			const Concentration &sh) const
+			const RealSpaceArrayDiffusion &se,
+			const RealSpaceArrayDiffusion &sh) const
 {
-  if( !_gridParam.isOutputProc() ) return;
+  //if( !_gridParam.isOutputProc() ) return;
 
   FILE *fp;
   char filename[300];
@@ -84,26 +64,22 @@ outputConcentration2DEG(const char *dname, const char *fhead,
   sprintf(filename, "%s/%s-e.dat", dname, fhead);
   fp = fopen(filename, "w");
 
-  for(int i=0; i<_realSGH.getSizeBlt(); i++){
-    fprintf(fp, "%g %g\n", _realSGH.getXiBlt(i),
-	    se.getAtBlt(i));
+  for(int i=0; i<_realSGH.getSize(); i++){
+    fprintf(fp, "%g %g\n", _realSGH.getAt(i), se.getAt(i));
   }
 
   fclose(fp);
 
-  if( _bltDsc.toAccountHole() ){
-    sprintf(filename, "%s/%s-h.dat", dname, fhead);
-    fp = fopen(filename, "w");
-    
-    for(int i=0; i<_realSGH.getSizeBlt(); i++){
-      fprintf(fp, "%g %g\n", _realSGH.getXiBlt(i),
-	      sh.getAtBlt(i));
-    }
-    
-    fclose(fp);
+  sprintf(filename, "%s/%s-h.dat", dname, fhead);
+  fp = fopen(filename, "w");
+  
+  for(int i=0; i<_realSGH.getSize(); i++){
+    fprintf(fp, "%g %g\n", _realSGH.getAt(i), sh.getAt(i));
   }
+  
+  fclose(fp);
 }
-*/
+
 
 /*
  * Output the electron concentration in the 2DEG in binary format.
@@ -113,7 +89,6 @@ outputConcentration2DEG(const char *dname, const char *fhead,
 void GrapheneTransportSolver1D::
 outputConcentration2DEGBin(const char *dname, const char *fhead) const
 {
-  /*
   //if( !_gridParam.isOutputProc() ) return;
 
   FILE *fp;
@@ -122,27 +97,24 @@ outputConcentration2DEGBin(const char *dname, const char *fhead) const
   sprintf(filename, "%s/%s-e.bin", dname, fhead);
   fp = fopen(filename, "wb");
 
-  vector<double> buf(_realSGH.getSizeBlt());
+  vector<double> buf(_realSGH.getSize());
 
-  for(int i=0; i<_realSGH.getSizeBlt(); i++){
-    buf[i] = _SigmaElectron.getAtBlt(i);
+  for(int i=0; i<_realSGH.getSize(); i++){
+    buf[i] = _SigmaElectron.getAt(i);
   }
 
   fwrite(&buf[0], sizeof(double), buf.size(), fp);
   fclose(fp);
 
-  if( _bltDsc.toAccountHole() ){
-    sprintf(filename, "%s/%s-h.bin", dname, fhead);
-    fp = fopen(filename, "wb");
+  sprintf(filename, "%s/%s-h.bin", dname, fhead);
+  fp = fopen(filename, "wb");
 
-    for(int i=0; i<_realSGH.getSizeBlt(); i++){
-      buf[i] = _SigmaHole.getAtBlt(i);
-    }
-
-    fwrite(&buf[0], sizeof(double), buf.size(), fp);
-    fclose(fp);
+  for(int i=0; i<_realSGH.getSize(); i++){
+    buf[i] = _SigmaHole.getAt(i);
   }
-  */
+
+  fwrite(&buf[0], sizeof(double), buf.size(), fp);
+  fclose(fp);
 }
 
 
@@ -188,12 +160,12 @@ outputPotential2DEG(const char *dname, const char *fhead) const
   fclose(fp);
 }
 */
- /*
+
 void GrapheneTransportSolver1D::
 outputPotential2DEG(const char *dname, const char *fhead,
-		    const Potential &pot) const
+		    const RealSpaceArrayDiffusion &pot) const
 {
-  if( !_gridParam.isOutputProc() ) return;
+  //if( !_gridParam.isOutputProc() ) return;
 
   FILE *fp;
   char filename[300];
@@ -202,13 +174,11 @@ outputPotential2DEG(const char *dname, const char *fhead,
   fp = fopen(filename, "w");
 
   for(int i=0; i<pot.getSize(); i++){
-    fprintf(fp, "%g %g\n", _realSGH.getXiPoisson(i),
-	    pot.getAt(i));
+    fprintf(fp, "%g %g\n", _realSGH.getAt(i), pot.getAt(i));
   }
 
   fclose(fp);
 }
- */
 
 
 /*
@@ -219,8 +189,7 @@ outputPotential2DEG(const char *dname, const char *fhead,
 void GrapheneTransportSolver1D::
 outputField2DEG(const char *dname, const char *fhead) const
 {
-  /*
-  if( !_gridParam.isOutputProc() ) return;
+  //if( !_gridParam.isOutputProc() ) return;
 
   FILE *fp;
   char filename[300];
@@ -229,20 +198,17 @@ outputField2DEG(const char *dname, const char *fhead) const
   fp = fopen(filename, "w");
 
   for(int i=0; i<_Ex.getSize(); i++){
-    fprintf(fp, "%g %g\n", _realSGH.getXiPoisson(i),
-	    _Ex.getAt(i));
+    fprintf(fp, "%g %g\n", _realSGH.getAt(i), _Ex.getAt(i));
   }
 
   fclose(fp);
-  */
 }
 
-/*
 void GrapheneTransportSolver1D::
 outputField2DEG(const char *dname, const char *fhead,
-		const Field &field) const
+		const RealSpaceArrayDiffusion &field) const
 {
-  if( !_gridParam.isOutputProc() ) return;
+  //if( !_gridParam.isOutputProc() ) return;
 
   FILE *fp;
   char filename[300];
@@ -251,13 +217,11 @@ outputField2DEG(const char *dname, const char *fhead,
   fp = fopen(filename, "w");
 
   for(int i=0; i<field.getSize(); i++){
-    fprintf(fp, "%g %g\n", _realSGH.getXiPoisson(i),
-	    field.getAt(i));
+    fprintf(fp, "%g %g\n", _realSGH.getAt(i), field.getAt(i));
   }
 
   fclose(fp);
 }
-*/
 
 
 /*

@@ -65,6 +65,16 @@ double RealSpaceGridHandler::getAt(int i) const
   return _x[i];
 }
 
+double RealSpaceGridHandler::getXl() const
+{
+  return _x[0];
+}
+
+double RealSpaceGridHandler::getXr() const
+{
+  return _x.back();
+}
+
 void RealSpaceGridHandler::setAt(int i, double val)
 {
   cerr << "RealSpaceGridHandler::setAt: do not modify the grid ";

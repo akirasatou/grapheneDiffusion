@@ -2,12 +2,12 @@
 
 #include "DiffusionSolver1D.h"
 #include "RealSpaceGridHandler.h"
+#include "RealSpaceArrayDiffusion.h"
+#include "FermiDistrGraphene.h"
 /*
 #include "Field.h"
 #include "Concentration.h"
 #include "Potential.h"
-#include "PhaseSpaceGridHandler.h"
-#include "FermiDistrGraphene.h"
 */
 #include <PhysicalConstants.h>
 #include <PhysicalUnits.h>
@@ -44,23 +44,17 @@ public:
 		       const std::string &format="") const;
   void outputConcentration2DEG(const char *dname, const char *fhead) const;
 
-  /*
   void outputConcentration2DEG(const char *dname, const char *fhead,
-			       const Concentration &se,
-			       const Concentration &sh) const;
-  */
+			       const RealSpaceArrayDiffusion &se,
+			       const RealSpaceArrayDiffusion &sh) const;
   void outputConcentration2DEGBin(const char *dname, const char *fhead) const;
 
   void outputPotential2DEG(const char *dname, const char *fhead) const;
-  /*
   void outputPotential2DEG(const char *dname, const char *fhead,
-			   const Potential &pot) const;
-  */
+			   const RealSpaceArrayDiffusion &pot) const;
   void outputField2DEG(const char *dname, const char *fhead) const;
-  /*
   void outputField2DEG(const char *dname, const char *fhead,
-		       const Field &field) const;
-  */
+		       const RealSpaceArrayDiffusion &field) const;
   void outputVelocity(const char *dname, const char *fhead);
 
 
@@ -72,12 +66,13 @@ private:
   DiffusionSolver1D _diffusion;
   RealSpaceGridHandler _realSGH;
 
-  /*
-  GridParameter _gridParam;
+  RealSpaceArrayDiffusion _SigmaElectron, _SigmaHole, _SigmaDope;
+  RealSpaceArrayDiffusion _Ex, _muElectron, _muHole;
 
   FermiDistrGraphene _fermiDistr;
-  Field _Ex;
-  Concentration _SigmaElectron, _SigmaHole, _Sigma0xi;
+
+  /*
+  GridParameter _gridParam;
   */
   int _nSteps;
 
@@ -85,28 +80,7 @@ private:
   std::string _SSDir, _concDir, _pot2DDir, _fieldDir, _velDir;
 
   void _initPoissonSolver();
-  //void _setInitialSteadyStateSCF();
-  //void _refineMeshSS(int nrNodesMax, bool toOutputMesh);
-
-  /*
   void _refineMesh();
-  void _setInitialSteadyStateLocalFermi();
-  void _setInitialSteadyStateSCFFermi(double rVg=1.0,
-				      double rVgPrev=-1.0);
-  void _updateConcentrations(Concentration &se, Concentration &sh, 
-			     Concentration &sePrev,
-			     Concentration &shPrev,
-			     const Potential &pot, double Ef0, 
-			     double maxChangeFraction) const;
-  void _solveAndCalcField2DEG(Field &Ex,
-			      const Concentration &SigmaElectron,
-			      const Concentration &SigmaHole,
-			      const Concentration &Sigma0);
-  void _solveAndCalcPotential2DEG(Potential &pot,
-				  const Concentration &SigmaElectron,
-				  const Concentration &SigmaHole,
-				  const Concentration &Sigma0);
-  void _calcInitialGuess(Concentration &se, Concentration &sh,
-			 double Ef0) const;
-  */
+  void _setInitialSteadyStateSCF();
+
 };

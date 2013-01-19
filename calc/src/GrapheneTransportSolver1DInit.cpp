@@ -1,5 +1,5 @@
 #include "GrapheneTransportSolver1D.h"
-//#include "ChargeDensity2D.h"
+#include "ChargeDensity2D.h"
 #include <math.h>
 #include <PhysicalConstants.h>
 #include <PhysicalUnits.h>
@@ -30,73 +30,44 @@ void GrapheneTransportSolver1D::_initPoissonSolver()
   // !Do not set too high concentration because it induces large
   // numerical errors when calculating with the real distribution.!
 
-  //const int nr = 10;
   const int nr = 2;
-  const double dsAmp = 0.5;
-  const double Sigma0min = 1e15;
-  /*
-  Concentration se(_realSGH), sh(_realSGH);
-  
+  const double dsAmp = 0.1;
+  const double SigmaArt = 1e16;
+
+  RealSpaceArrayDiffusion se(_realSGH), sh(_realSGH), sDope(_realSGH);
+
   for(int n=0; n<nr && _poisson.getNrNodes()<16000; n++){
   
   // Refinement using the first perturbed concentration.
-  
-    for(int i=-1; i<_realSGH.getSizeBlt()+1; i++){
-      double a = (_realSGH.getXiBlt(i)-_realSGH.getXlBlt())/(_realSGH.getXrBlt()-_realSGH.getXlBlt());
-      double ds = 0.0;
+
+    for(int i=0; i<_realSGH.getSize(); i++){
+      double a = (_realSGH.getAt(i)-_realSGH.getXl())/(_realSGH.getXr()-_realSGH.getXl());
       
-      if(_bltDsc.getTypeBCLeft() == BCPeriodic){
-	ds = dsAmp*sin(2*M_PI*a);
-      }
-      else {
-	ds = dsAmp*sin(M_PI*(0.9*a+0.05));
-      }
-      
-      if(fabs(_Sigma0xi.getAtBlt(i)) < Sigma0min){
-	ds *= Sigma0min;
-      }
-      else {
-	ds *= _Sigma0xi.getAtBlt(i);
-      }
-      
-      se.setAtBlt(i, _Sigma0xi.getAtBlt(i)+ds);
-      sh.setAtBlt(i, 0.0);
+      se.setAt(i, SigmaArt*(1.0+dsAmp*sin(2*M_PI*a)));
+      sh.setAt(i, 0.0);
+      sDope.setAt(i, 0.0);
     }
     
-    ChargeDensity2D rho2D(se, sh, _Sigma0xi);
+    ChargeDensity2D rho2D(se, sh, sDope);
     
     rho2D.updateInterpolator();
     _poisson.solve(rho2D);
     _refineMesh();
     
     sprintf(filehead, "phiInit-n=%d", 2*n);
-    outputPotential(".", filehead, true);
-    
+    outputPotential(_SSDir.c_str(), filehead, true);
+
     
     // Refinement using the second perturbed concentration.
     
     if(_poisson.getNrNodes() >= 16000) break;
     
-    for(int i=-1; i<_realSGH.getSizeBlt()+1; i++){
-      double a = (_realSGH.getXiBlt(i)-_realSGH.getXlBlt())/(_realSGH.getXrBlt()-_realSGH.getXlBlt());
-      double ds = 0.0;
+    for(int i=0; i<_realSGH.getSize(); i++){
+      double a = (_realSGH.getAt(i)-_realSGH.getXl())/(_realSGH.getXr()-_realSGH.getXl());
       
-      if(_bltDsc.getTypeBCLeft() == BCPeriodic){
-	ds = dsAmp*cos(2*M_PI*a);
-      }
-      else {
-	ds = dsAmp*cos(M_PI*(0.9*a+0.05));
-      }
-      
-      if(fabs(_Sigma0xi.getAtBlt(i)) < Sigma0min){
-	ds *= Sigma0min;
-      }
-      else {
-	ds *= _Sigma0xi.getAtBlt(i);
-      }
-      
-      se.setAtBlt(i, _Sigma0xi.getAtBlt(i)+ds);
-      sh.setAtBlt(i, 0.0);
+      se.setAt(i, SigmaArt*(1.0+dsAmp*cos(2*M_PI*a)));
+      sh.setAt(i, 0.0);
+      sDope.setAt(i, 0.0);
     }
     
     rho2D.updateInterpolator();
@@ -104,7 +75,6 @@ void GrapheneTransportSolver1D::_initPoissonSolver()
     _refineMesh();
     
     sprintf(filehead, "phiInit-n=%d", 2*n+1);
-    outputPotential(".", filehead, true);
+    outputPotential(_SSDir.c_str(), filehead, true);
   }
-  */
 }

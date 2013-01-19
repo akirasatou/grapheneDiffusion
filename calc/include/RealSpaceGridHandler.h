@@ -20,6 +20,8 @@ public:
   double getAt(int i) const;
   int getSize() const;
 
+  double getXl() const;
+  double getXr() const;
   std::pair<int, int> getPointID(int i) const;
   int getPointInvID(int iElem, int qp) const;
 
