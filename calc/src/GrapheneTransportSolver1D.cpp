@@ -18,11 +18,14 @@ GrapheneTransportSolver1D(const PoissonSolver2DDescriptor &poiDsc,
 			  const DiffusionSolver1DDescriptor &difDsc,
 			  const OutputDirectoryManager &odm):
   _poiDsc(poiDsc), _difDsc(difDsc), _poisson(poiDsc),
-  _diffusion(_difDsc, _poisson, _poiDsc.getXlPoisson(), _poiDsc.getXrPoisson()),
-  _realSGH(_diffusion.getRealSGH()), _SigmaElectron(_realSGH),
-  _SigmaHole(_realSGH), _SigmaDope(_realSGH), _Ex(_realSGH),
+  _diffusion(_difDsc, _ab, _dsh, _poiDsc.getXlPoisson(), _poiDsc.getXrPoisson()),
+  _realSGH(_diffusion.getRealSGH()),
+  _ab(_difDsc.getT(), _difDsc.get_alpha()), _dsh(_realSGH),
+  _SigmaElectron(_realSGH), _SigmaHole(_realSGH),
+  _SigmaDope(_realSGH), _Ex(_realSGH),
   _muElectron(_realSGH), _muHole(_realSGH),
-  _fermiDistr(_difDsc.getT()), _nSteps(0), _odm(odm)
+  _fermiDistr(_difDsc.getT()), 
+  _nSteps(0), _odm(odm)
 {
 
   // Check the validity of descriptors.

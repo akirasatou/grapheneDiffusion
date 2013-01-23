@@ -2,7 +2,8 @@
 #include "nonlinear_implicit_system.h"
 #include "mesh_base.h"
 #include "sparse_matrix.h"
-#include "DiffusionSolver1DDescriptor.h"
+#include "DiffusionABCalculator.h"
+#include "DiffusionSolutionHolder.h"
 #include <Transistor2D/PoissonSolver2D.h>
 
 
@@ -17,11 +18,15 @@ class ResidualAndJacobianDiffusion:
 {
 public:
 
-  ResidualAndJacobianDiffusion(const DiffusionSolver1DDescriptor &difDsc, PoissonSolver2D &poisson);
-  void residual(const NumericVector<Number> &X,
+  ResidualAndJacobianDiffusion(const DiffusionABCalculator &ab,
+			       DiffusionSolutionHolder &dsh,
+			       const MeshBase &meshBase,
+			       const DofMap &dofMap,
+			       double dt);
+  void residual(const NumericVector<Number> &U,
                 NumericVector<Number> &R,
 		NonlinearImplicitSystem &sys);
-  void jacobian(const NumericVector<Number> &X,
+  void jacobian(const NumericVector<Number> &U,
 		SparseMatrix<Number> &J, 
 		NonlinearImplicitSystem &sys);
 
@@ -30,7 +35,10 @@ public:
 
 private:
 
-  const DiffusionSolver1DDescriptor &_difDsc;
-  PoissonSolver2D &_poisson;
+  const DiffusionABCalculator &_ab;
+  DiffusionSolutionHolder &_dsh;
+  const MeshBase *_meshBaseRef;
+  const DofMap *_dofMapRef;
+  double _dt;
 
 };

@@ -8,8 +8,13 @@ using namespace std;
  */
 
 ResidualAndJacobianDiffusion::
-ResidualAndJacobianDiffusion(const DiffusionSolver1DDescriptor &difDsc, PoissonSolver2D &poisson):
-  _difDsc(difDsc), _poisson(poisson)
+ResidualAndJacobianDiffusion(const DiffusionABCalculator &ab,
+			     DiffusionSolutionHolder &dsh,
+			     const MeshBase &meshBase,
+			     const DofMap &dofMap,
+			     double dt):
+  _ab(ab), _dsh(dsh), _meshBaseRef(&meshBase),
+  _dofMapRef(&dofMap), _dt(dt)
 {
 }
 
@@ -29,13 +34,13 @@ ResidualAndJacobianDiffusion::~ResidualAndJacobianDiffusion()
  */
 
 void ResidualAndJacobianDiffusion::
-residual(const NumericVector<Number> &X, NumericVector<Number> &R,
+residual(const NumericVector<Number> &U, NumericVector<Number> &R,
 	 NonlinearImplicitSystem &sys)
 {
 }
 
 void ResidualAndJacobianDiffusion::
-jacobian(const NumericVector<Number> &X, SparseMatrix<Number> &J, 
+jacobian(const NumericVector<Number> &U, SparseMatrix<Number> &J, 
 	 NonlinearImplicitSystem &sys)
 {
 }

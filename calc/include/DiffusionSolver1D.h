@@ -1,6 +1,8 @@
 #pragma once
 #include "DiffusionSolver1DDescriptor.h"
 #include "RealSpaceGridHandler.h"
+#include "DiffusionABCalculator.h"
+#include "DiffusionSolutionHolder.h"
 #include "ResidualAndJacobianDiffusion.h"
 #include <Transistor2D/PoissonSolver2D.h>
 #include <libmesh.h>
@@ -21,7 +23,9 @@ class DiffusionSolver1D
 public:
 
   DiffusionSolver1D(const DiffusionSolver1DDescriptor &difDsc,
-		    PoissonSolver2D &poisson, double xl, double xr);
+		    const DiffusionABCalculator &ab,
+		    DiffusionSolutionHolder &dsh,
+		    double xl, double xr);
   ~DiffusionSolver1D();
   RealSpaceGridHandler getRealSGH();
   void solveStep();
@@ -35,8 +39,9 @@ private:
   EquationSystems _es;
   //MeshRefinement _mRef;
   const DiffusionSolver1DDescriptor &_difDsc;
-  PoissonSolver2D &_poisson;
-  ResidualAndJacobianDiffusion _rj;
+  const DiffusionABCalculator &_ab;
+  DiffusionSolutionHolder &_dsh;
+  ResidualAndJacobianDiffusion *_rj;
   double _Xl, _Xr;
   int _nrSteps;
 

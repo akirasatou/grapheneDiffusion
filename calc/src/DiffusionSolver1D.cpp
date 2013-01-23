@@ -33,10 +33,11 @@ const string DiffusionSolver1D::_className("DiffusionSolver1D");
 
 DiffusionSolver1D::
 DiffusionSolver1D(const DiffusionSolver1DDescriptor &difDsc,
-		  PoissonSolver2D &poisson, double xl, double xr):
+		  const DiffusionABCalculator &ab,
+		  DiffusionSolutionHolder &dsh, double xl, double xr):
   _sysName(difDsc.getFileHeadStr()), _mesh(1), _es(_mesh),
   //_mRef(_mesh),
-  _difDsc(difDsc), _poisson(poisson), _rj(difDsc, poisson),
+  _difDsc(difDsc), _ab(ab), _dsh(dsh),
   _Xl(xl), _Xr(xr), _nrSteps(0)
 {
 
@@ -61,8 +62,11 @@ DiffusionSolver1D(const DiffusionSolver1DDescriptor &difDsc,
 
   // Set residual_and_jacobian_object.
 
-  sys.nonlinear_solver->residual_object = &_rj;
-  sys.nonlinear_solver->jacobian_object = &_rj;
+  _rj = new ResidualAndJacobianDiffusion(_ab, _dsh, _es.get_mesh(),
+					 sys.get_dof_map(), 
+					 _difDsc.get_dt());
+  sys.nonlinear_solver->residual_object = _rj;
+  sys.nonlinear_solver->jacobian_object = _rj;
 
   
   // Initialize the equation systems.
@@ -103,6 +107,9 @@ DiffusionSolver1D(const DiffusionSolver1DDescriptor &difDsc,
 
 DiffusionSolver1D::~DiffusionSolver1D()
 {
+  if( _rj != (ResidualAndJacobianDiffusion *)NULL ){
+    delete _rj;
+  }
 }
 
 

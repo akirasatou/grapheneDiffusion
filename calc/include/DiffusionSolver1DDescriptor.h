@@ -26,6 +26,7 @@ class DiffusionSolver1DDescriptor
   inline double getLc() const { return _Lc; }
   inline double getSigma0() const { return _Sigma0; }
   inline double getT() const { return _T; }
+  inline double get_alpha() const { return _alpha; }
   inline double get_tMax() const { return _tMax; }
 
   inline double get_tOutputStep() const { return _tOutputStep; }

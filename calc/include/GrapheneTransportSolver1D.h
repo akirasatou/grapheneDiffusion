@@ -4,6 +4,8 @@
 #include "RealSpaceGridHandler.h"
 #include "RealSpaceArrayDiffusion.h"
 #include "FermiDistrGraphene.h"
+#include "DiffusionABCalculator.h"
+#include "DiffusionSolutionHolder.h"
 /*
 #include "Field.h"
 #include "Concentration.h"
@@ -18,7 +20,7 @@
 
 /*
  * Class solving the Diffusion equation with self-consistent 
- * Poisson equation. Kind of facade" DiffusionnSolver1D and
+ * Poisson equation. Kind of facade" DiffusionSolver1D and
  * PoissonSolver2D, keeping the algorithm of how they are used in
  * cooperation and providing output methods.
  */
@@ -65,6 +67,8 @@ private:
   PoissonSolver2D _poisson;
   DiffusionSolver1D _diffusion;
   RealSpaceGridHandler _realSGH;
+  DiffusionABCalculator _ab;
+  DiffusionSolutionHolder _dsh;
 
   RealSpaceArrayDiffusion _SigmaElectron, _SigmaHole, _SigmaDope;
   RealSpaceArrayDiffusion _Ex, _muElectron, _muHole;
