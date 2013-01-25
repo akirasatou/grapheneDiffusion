@@ -78,6 +78,7 @@ GrapheneTransportSolver1D(const PoissonSolver2DDescriptor &poiDsc,
   // Initial SCF distribution.
 
   _setInitialSteadyStateSCF();
+
 }
 
 /*
@@ -100,6 +101,12 @@ void GrapheneTransportSolver1D::solveStep()
   double t = getTime();
 
   _diffusion.solveStep();
+
+  cerr << t << endl;
+  for(int i=0; i<_poiDsc.getGates().size(); i++){
+    cerr << _poiDsc.getGates()[i]->getVoltage(t) << " ";
+  }
+  cerr << endl;
 
 
   // Output.

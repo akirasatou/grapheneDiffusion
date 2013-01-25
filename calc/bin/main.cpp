@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <iostream>
+#include <fparser.hh>
 
 using namespace std;
 
@@ -61,7 +62,7 @@ int main(int argc, char *argv[])
 
   odm.push(ValueStringGenerator("L", "default").getValueString(m2nm(poiDsc.getL())));
   odm.push(ValueStringGenerator("Lg", "default").getValueString(m2nm(poiDsc.getGates()[0]->getLg())));
-  odm.push(ValueStringGenerator("Vg", "default").getValueString(poiDsc.getGates()[0]->getVoltage()));
+  odm.push(ValueStringGenerator("Vg", "default").getValueString(poiDsc.getGates()[0]->getVoltage(0.0)));
 
 
   // Initialize the solver.

@@ -69,7 +69,7 @@ void GrapheneTransportSolver1D::_setInitialSteadyStateSCF()
 
   for(int i=0; i<pot.getSize(); i++) pot.setAt(i, 0.0);
   rho2D.updateInterpolator();
-  _poisson.solveAndCalcPotential2DEG(pot, rho2D, true);
+  _poisson.solveAndCalcPotential2DEG(0.0, pot, rho2D, true);
 
 
   // Output the potential and concentration.
