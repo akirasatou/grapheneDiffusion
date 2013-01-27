@@ -32,6 +32,7 @@ class DiffusionSolver1DDescriptor
   inline double get_tOutputStep() const { return _tOutputStep; }
   inline double get_tOutputBinStep() const { return _tOutputBinStep; }
   inline bool toOutputSS() const { return _toOutputSS; }
+  inline bool toOutputFermiLevel() const { return _toOutputFermiLevel; }
   inline bool toOutputConcentration() const { return _toOutputConcentration; }
   inline bool toOutputPotential2D() const { return _toOutputPotential2D; }
   inline bool toOutputField() const { return _toOutputField; }
@@ -58,8 +59,8 @@ class DiffusionSolver1DDescriptor
   void _setSimulationSection();
 
   double _tOutputStep, _tOutputBinStep;
-  bool _toOutputSS, _toOutputConcentration, _toOutputPotential2D;
-  bool _toOutputField, _toOutputVelocity;
+  bool _toOutputSS, _toOutputFermiLevel, _toOutputConcentration;
+  bool _toOutputPotential2D, _toOutputField, _toOutputVelocity;
   void _registerOutputSection();
   void _setOutputSection();
 

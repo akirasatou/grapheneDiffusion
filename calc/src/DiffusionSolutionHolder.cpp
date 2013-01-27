@@ -37,3 +37,22 @@ setInitialSolutions(const RealSpaceArrayDiffusion &mue0,
     _dEx_dx_n.setAt(i, dEx_dx0.getAt(i));
   }
 }
+
+
+/*
+ * Get the current solutions $\mu_{r,n}$, $E_{x,n}$.
+ */
+
+void DiffusionSolutionHolder::
+getCurrentSolutions(RealSpaceArrayDiffusion &mue,
+		    RealSpaceArrayDiffusion &muh,
+		    RealSpaceArrayDiffusion &Ex) const
+{
+  const int n = _mue_n.getSize();
+
+  for(int i=0; i<n; i++){
+    mue.setAt(i, _mue_n.getAt(i));
+    muh.setAt(i, _muh_n.getAt(i));
+    Ex.setAt(i, _Ex_n.getAt(i));
+  }
+}

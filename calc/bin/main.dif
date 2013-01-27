@@ -13,7 +13,7 @@ Simulation {
 
 Output {
   tOutputStep 100
-  tOutputBinStep 10
+  tOutputBinStep 100000
   toOutputSS true
-  toOutputConcentration true
+  toOutputFermiLevel true
 }

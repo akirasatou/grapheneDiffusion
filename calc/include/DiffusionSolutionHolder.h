@@ -16,6 +16,10 @@ public:
 			   const RealSpaceArrayDiffusion &Ex0,
 			   const RealSpaceArrayDiffusion &dEx_dx0);
 
+  void getCurrentSolutions(RealSpaceArrayDiffusion &mue,
+			   RealSpaceArrayDiffusion &muh,
+			   RealSpaceArrayDiffusion &Ex) const;
+
 
 private:
   

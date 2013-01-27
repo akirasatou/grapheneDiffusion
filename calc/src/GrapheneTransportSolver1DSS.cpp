@@ -65,7 +65,8 @@ void GrapheneTransportSolver1D::_setInitialSteadyStateSCF()
 
 
   // Solve the linear Poisson once to have the initial solution vector
-  // for the nonlinear Poisson.
+  // for the nonlinear Poisson. The time is slightly shifted from 0
+  // to deal with abrupt gate-voltage off: $V_{g0}\theta(-t)$.
 
   RealSpaceArrayDiffusion Ex(_realSGH), dEx_dx(_realSGH);
 
@@ -75,7 +76,8 @@ void GrapheneTransportSolver1D::_setInitialSteadyStateSCF()
   }
 
   rho2D.updateInterpolator();
-  _poisson.solveAndCalcField2DEG(0.0, Ex, dEx_dx, rho2D, true);
+  _poisson.solveAndCalcField2DEG(_difDsc.get_dt()/1000, Ex, dEx_dx,
+				 rho2D);
 
 
   // Set the initial solutions to the holder.

@@ -98,6 +98,8 @@ _calcEfHeavilyDoped(double Sigma0hd, bool toAccountHole)
 
 void GrapheneTransportSolver1D::solveStep()
 {
+  // Solve.
+
   double t = getTime();
 
   _diffusion.solveStep();
@@ -109,20 +111,31 @@ void GrapheneTransportSolver1D::solveStep()
   cerr << endl;
 
 
+  // Get the current solutions from the holder.
+
+  _dsh.getCurrentSolutions(_muElectron, _muHole, _Ex);
+
+
   // Output.
 
   int n_output_step = (int)round(_difDsc.get_tOutputStep()/_difDsc.get_dt());
   int n_outputBin_step = (int)round(_difDsc.get_tOutputBinStep()/_difDsc.get_dt());
   char filehead[300];
 
+  /*
   if(_nSteps%n_outputBin_step == 0){
     if( _difDsc.toOutputConcentration() ){
       sprintf(filehead, "conc-t=%04.0ffs", s2fs(t));
       outputConcentration2DEGBin(_concDir.c_str(), filehead);
     }
   }
+  */
   
   if(_nSteps%n_output_step == 0){
+    if( _difDsc.toOutputFermiLevel() ){
+      sprintf(filehead, "mu-t=%04.0ffs", s2fs(t));
+      outputFermiLevel2DEG(_concDir.c_str(), filehead);
+    }
     if( _difDsc.toOutputConcentration() ){
       sprintf(filehead, "conc-t=%04.0ffs", s2fs(t));
       outputConcentration2DEG(_concDir.c_str(), filehead);

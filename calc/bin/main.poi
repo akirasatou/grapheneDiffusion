@@ -13,7 +13,7 @@ LeftRightBoundary {
 
 Gate {
   Ng 2
-  Vg 50 -50
+  Vg 50*(t<=0.0) -50*(t<=0.0)
   Lg 1000
   Wg 1000
   tg 10
@@ -22,7 +22,7 @@ Gate {
 
 BottomGate {
   bottomNg 2
-  bottomVg 50 -50
+  bottomVg 50*(t<=0.0) -50*(t<=0.0)
   bottomLg 1000
   bottomWg 1000
   bottom_tg 10

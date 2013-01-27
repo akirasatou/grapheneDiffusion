@@ -121,6 +121,8 @@ void DiffusionSolver1DDescriptor::_registerOutputSection()
 
   secOutput.registerParameterStringWithDefault("toOutputSS", "false");
   secOutput.getParameter("toOutputSS").setPVC(new PVCStringInTab(boolTab, 2));
+  secOutput.registerParameterStringWithDefault("toOutputFermiLevel", "false");
+  secOutput.getParameter("toOutputFermiLevel").setPVC(new PVCStringInTab(boolTab, 2));
   secOutput.registerParameterStringWithDefault("toOutputConcentration", "false");
   secOutput.getParameter("toOutputConcentration").setPVC(new PVCStringInTab(boolTab, 2));
   secOutput.registerParameterStringWithDefault("toOutputPotential2D", "false");
@@ -183,6 +185,7 @@ void DiffusionSolver1DDescriptor::_setOutputSection()
   }
 
   _toOutputSS = (secOutput.getParameter("toOutputSS").getString()=="true");
+  _toOutputFermiLevel = (secOutput.getParameter("toOutputFermiLevel").getString()=="true");
   _toOutputConcentration = (secOutput.getParameter("toOutputConcentration").getString()=="true");
   _toOutputPotential2D = (secOutput.getParameter("toOutputPotential2D").getString()=="true");
   _toOutputField = (secOutput.getParameter("toOutputField").getString()=="true");
