@@ -62,21 +62,32 @@ void GrapheneTransportSolver1D::_setInitialSteadyStateSCF()
     _muElectron.setAt(i, E);
     _muHole.setAt(i, E);
   }
-    
+
 
   // Solve the linear Poisson once to have the initial solution vector
   // for the nonlinear Poisson.
 
-  for(int i=0; i<pot.getSize(); i++) pot.setAt(i, 0.0);
+  RealSpaceArrayDiffusion Ex(_realSGH), dEx_dx(_realSGH);
+
+  for(int i=0; i<Ex.getSize(); i++){
+    Ex.setAt(i, 0.0);
+    dEx_dx.setAt(i, 0.0);
+  }
+
   rho2D.updateInterpolator();
-  _poisson.solveAndCalcPotential2DEG(0.0, pot, rho2D, true);
+  _poisson.solveAndCalcField2DEG(0.0, Ex, dEx_dx, rho2D, true);
 
 
-  // Output the potential and concentration.
+  // Set the initial solutions to the holder.
 
-  outputPotential2DEG(_SSDir.c_str(), "pot-SS", pot);
+  _dsh.setInitialSolutions(_muElectron, _muHole, Ex, dEx_dx);
+
+
+  // Output the field and concentration.
+
+  outputField2DEG(_SSDir.c_str(), "Ex-SS", Ex);
   outputConcentration2DEG(_SSDir.c_str(), "conc-SS", se, sh);
-  outputPotential(_SSDir.c_str(), "pot2D-SS", true);
+  outputFermiLevel2DEG(_SSDir.c_str(), "mu-SS");
 
   MPI_Barrier(MPI_COMM_WORLD);
 }

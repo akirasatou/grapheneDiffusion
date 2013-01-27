@@ -119,6 +119,41 @@ outputConcentration2DEGBin(const char *dname, const char *fhead) const
 
 
 /*
+ * Output the Fermi levels of electrons and holes in the 2DEG.
+ * Note that this function generates files with extension ".dat".
+ */
+
+void GrapheneTransportSolver1D::
+outputFermiLevel2DEG(const char *dname, const char *fhead) const
+{
+  //if( !_gridParam.isOutputProc() ) return;
+
+  FILE *fp;
+  char filename[300];
+
+  sprintf(filename, "%s/%s-e.dat", dname, fhead);
+  fp = fopen(filename, "w");
+
+  for(int i=0; i<_realSGH.getSize(); i++){
+    fprintf(fp, "%g %g\n", _realSGH.getAt(i),
+	    J2meV(_muElectron.getAt(i)));
+  }
+
+  fclose(fp);
+
+  sprintf(filename, "%s/%s-h.dat", dname, fhead);
+  fp = fopen(filename, "w");
+    
+  for(int i=0; i<_realSGH.getSize(); i++){
+    fprintf(fp, "%g %g\n", _realSGH.getAt(i),
+	    J2meV(_muHole.getAt(i)));
+  }
+  
+  fclose(fp);
+}
+
+
+/*
  * Output the potential in the 2DEG.
  * Note that this function generates files with extension ".dat".
  */

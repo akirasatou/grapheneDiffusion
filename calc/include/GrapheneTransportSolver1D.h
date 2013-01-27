@@ -50,7 +50,7 @@ public:
 			       const RealSpaceArrayDiffusion &se,
 			       const RealSpaceArrayDiffusion &sh) const;
   void outputConcentration2DEGBin(const char *dname, const char *fhead) const;
-
+  void outputFermiLevel2DEG(const char *dname, const char *fhead) const;
   void outputPotential2DEG(const char *dname, const char *fhead) const;
   void outputPotential2DEG(const char *dname, const char *fhead,
 			   const RealSpaceArrayDiffusion &pot) const;
