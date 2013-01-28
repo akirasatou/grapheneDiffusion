@@ -38,7 +38,7 @@ DiffusionSolver1D(const DiffusionSolver1DDescriptor &difDsc,
   _sysName(difDsc.getFileHeadStr()), _mesh(1), _es(_mesh),
   //_mRef(_mesh),
   _difDsc(difDsc), _ab(ab), _dsh(dsh),
-  _Xl(xl), _Xr(xr), _nrSteps(0)
+  _Xl(xl), _Xr(xr)
 {
 
   // Generate a uniform mesh. Each element has 3 interior points.
@@ -63,8 +63,7 @@ DiffusionSolver1D(const DiffusionSolver1DDescriptor &difDsc,
   // Set residual_and_jacobian_object.
 
   _rj = new ResidualAndJacobianDiffusion(_ab, _dsh, _es.get_mesh(),
-					 sys.get_dof_map(), 
-					 _difDsc.get_dt());
+					 sys.get_dof_map());
   sys.nonlinear_solver->residual_object = _rj;
   sys.nonlinear_solver->jacobian_object = _rj;
 

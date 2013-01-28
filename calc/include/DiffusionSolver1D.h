@@ -28,7 +28,7 @@ public:
 		    double xl, double xr);
   ~DiffusionSolver1D();
   RealSpaceGridHandler getRealSGH();
-  void solveStep();
+  void solveStep(double t, double dt);
 
 
 private:
@@ -43,7 +43,6 @@ private:
   DiffusionSolutionHolder &_dsh;
   ResidualAndJacobianDiffusion *_rj;
   double _Xl, _Xr;
-  int _nrSteps;
 
   enum BoundaryID { BoundaryIDNone, BoundaryIDLeft, BoundaryIDRight };
 

@@ -21,14 +21,14 @@ public:
   ResidualAndJacobianDiffusion(const DiffusionABCalculator &ab,
 			       DiffusionSolutionHolder &dsh,
 			       const MeshBase &meshBase,
-			       const DofMap &dofMap,
-			       double dt);
+			       const DofMap &dofMap);
   void residual(const NumericVector<Number> &U,
                 NumericVector<Number> &R,
 		NonlinearImplicitSystem &sys);
   void jacobian(const NumericVector<Number> &U,
 		SparseMatrix<Number> &J, 
 		NonlinearImplicitSystem &sys);
+  void setTime(double t, double dt);
 
   virtual ~ResidualAndJacobianDiffusion();
 
@@ -39,6 +39,10 @@ private:
   DiffusionSolutionHolder &_dsh;
   const MeshBase *_meshBaseRef;
   const DofMap *_dofMapRef;
-  double _dt;
+  double _t, _dt;
+  bool _doOnceFlag;
+
+  void _setNextSolutionsInNonlinearIteration(const NumericVector<Number> &U,
+					     NonlinearImplicitSystem &sys);
 
 };

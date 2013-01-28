@@ -8,11 +8,13 @@ using namespace std;
  */
 
 DiffusionSolutionHolder::
-DiffusionSolutionHolder(const RealSpaceGridHandler &realSGH):
-  _mue_n(realSGH), _muh_n(realSGH), _Ex_n(realSGH),
-  _dEx_dx_n(realSGH),
-  _mue_n1_l(realSGH), _muh_n1_l(realSGH), _Ex_n1_l(realSGH),
-  _dEx_dx_n1_l(realSGH)
+DiffusionSolutionHolder(const RealSpaceGridHandler &realSGH,
+			PoissonSolver2D &poisson):
+  _mue_n(realSGH), _mue_n1_l(realSGH), _mue_n1_l1(realSGH),
+  _muh_n(realSGH), _muh_n1_l(realSGH), _muh_n1_l1(realSGH),
+  _Ex_n(realSGH), _Ex_n1_l(realSGH), _Ex_n1_l1(realSGH),
+  _dEx_dx_n(realSGH), _dEx_dx_n1_l(realSGH), _dEx_dx_n1_l1(realSGH),
+  _poisson(poisson)
 {
 }
 
@@ -55,4 +57,85 @@ getCurrentSolutions(RealSpaceArrayDiffusion &mue,
     muh.setAt(i, _muh_n.getAt(i));
     Ex.setAt(i, _Ex_n.getAt(i));
   }
+}
+
+
+/*
+ * Set the current time and the increment to the next time step.
+ */
+
+void DiffusionSolutionHolder::setTime(double t, double dt)
+{
+  _t = t;
+  _dt = dt;
+}
+
+
+/*
+ * Update the solutions to the next time step.
+ */
+
+void DiffusionSolutionHolder::updateSolutions()
+{
+  const int n = _mue_n.getSize();
+
+  for(int i=0; i<n; i++){
+    _mue_n.setAt(i, _mue_n1_l1.getAt(i));
+    _muh_n.setAt(i, _muh_n1_l1.getAt(i));
+    _Ex_n.setAt(i, _Ex_n1_l1.getAt(i));
+    _dEx_dx_n.setAt(i, _dEx_dx_n1_l1.getAt(i));
+  }
+}
+
+
+/*
+ * Set the solutions of the previous time step as the start of
+ * the nonlinear iteration: $\mu_{r, n+1}^{(l=0)} <- \mu_{r,n}$.
+ */
+
+void DiffusionSolutionHolder::
+setInitialSolutionsInNonlinearIteration()
+{
+  const int n = _mue_n.getSize();
+
+  for(int i=0; i<n; i++){
+    _mue_n1_l.setAt(i, _mue_n.getAt(i));
+    _muh_n1_l.setAt(i, _muh_n.getAt(i));
+    _Ex_n1_l.setAt(i, _Ex_n.getAt(i));
+  }
+}
+
+
+/*
+ * Shift to the next nonlinear iteration.
+ */
+
+void DiffusionSolutionHolder::shiftSolutionsInNonlinearIteration()
+{
+  const int n = _mue_n.getSize();
+
+  for(int i=0; i<n; i++){
+    _mue_n1_l.setAt(i, _mue_n1_l1.getAt(i));
+    _muh_n1_l.setAt(i, _muh_n1_l1.getAt(i));
+    _Ex_n1_l.setAt(i, _Ex_n1_l1.getAt(i));
+    _dEx_dx_n1_l.setAt(i, _dEx_dx_n1_l1.getAt(i));
+  }
+}
+
+
+/*
+ * Update the solutions in nonlinear iteration.
+ */
+
+void DiffusionSolutionHolder::updateSolutionsInNonlinearIteration()
+{
+  // Calculate the charge density from $\mu_{r,n+1}^{(l+1)}$.
+
+  // Calculate $E_{x,n+1}^{(l+1)}$ and $dE_{x,n+1}^{(l+1)}/dx$.
+
+  // rho2D
+  //_poisson.solveAndCalcField2DEG(_t, _Ex_n1_l1, _dEx_dx_n1_l1,
+  //rho2D);
+
+
 }
