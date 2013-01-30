@@ -17,7 +17,7 @@ void DiffusionSolver1D::solveStep(double t, double dt)
   // Update the time.
 
   sys.time = t;
-  _dsh.setTime(t, dt);
+  _pdm.setTime(t, dt);
   _rj->setTime(t, dt);
 
 
@@ -29,7 +29,7 @@ void DiffusionSolver1D::solveStep(double t, double dt)
   // Set the solutions of the previous time step as the start of
   // the nonlinear iteration: $\mu_{r, n+1}^{(l=0)} <- \mu_{r,n}$.
 
-  _dsh.setInitialSolutionsInNonlinearIteration();
+  _pdm.setInitialSolutionsInNonlinearIteration();
 
 
   // Solve the diffusion equation by nonlinear Newton iteration.
@@ -39,5 +39,5 @@ void DiffusionSolver1D::solveStep(double t, double dt)
 
   // Update the solutions to the next time step.
 
-  _dsh.updateSolutions();
+  _pdm.updateSolutions();
 }

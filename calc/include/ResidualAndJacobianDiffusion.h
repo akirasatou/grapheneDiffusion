@@ -3,7 +3,7 @@
 #include "mesh_base.h"
 #include "sparse_matrix.h"
 #include "DiffusionABCalculator.h"
-#include "DiffusionSolutionHolder.h"
+#include "PoissonDiffusionMediator.h"
 #include <Transistor2D/PoissonSolver2D.h>
 
 
@@ -19,7 +19,7 @@ class ResidualAndJacobianDiffusion:
 public:
 
   ResidualAndJacobianDiffusion(const DiffusionABCalculator &ab,
-			       DiffusionSolutionHolder &dsh,
+			       PoissonDiffusionMediator &pdm,
 			       const MeshBase &meshBase,
 			       const DofMap &dofMap);
   void residual(const NumericVector<Number> &U,
@@ -36,7 +36,7 @@ public:
 private:
 
   const DiffusionABCalculator &_ab;
-  DiffusionSolutionHolder &_dsh;
+  PoissonDiffusionMediator &_pdm;
   const MeshBase *_meshBaseRef;
   const DofMap *_dofMapRef;
   double _t, _dt;

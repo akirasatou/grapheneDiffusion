@@ -5,7 +5,7 @@
 #include "RealSpaceArrayDiffusion.h"
 #include "FermiDistrGraphene.h"
 #include "DiffusionABCalculator.h"
-#include "DiffusionSolutionHolder.h"
+#include "PoissonDiffusionMediator.h"
 /*
 #include "Field.h"
 #include "Concentration.h"
@@ -68,7 +68,7 @@ private:
   DiffusionSolver1D _diffusion;
   RealSpaceGridHandler _realSGH;
   DiffusionABCalculator _ab;
-  DiffusionSolutionHolder _dsh;
+  PoissonDiffusionMediator _pdm;
 
   RealSpaceArrayDiffusion _SigmaElectron, _SigmaHole, _SigmaDope;
   RealSpaceArrayDiffusion _Ex, _muElectron, _muHole;

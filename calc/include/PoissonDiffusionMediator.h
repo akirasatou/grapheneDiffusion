@@ -4,13 +4,13 @@
 #include "RealSpaceArrayDiffusion.h"
 #include <Transistor2D/PoissonSolver2D.h>
 
-class DiffusionSolutionHolder
+class PoissonDiffusionMediator
 {
 
 public:
 
-  DiffusionSolutionHolder(const RealSpaceGridHandler &realSGH,
-			  PoissonSolver2D &poisson);
+  PoissonDiffusionMediator(const RealSpaceGridHandler &realSGH,
+			   PoissonSolver2D &poisson);
   void setInitialSolutions(const RealSpaceArrayDiffusion &mue0,
 			   const RealSpaceArrayDiffusion &muh0,
 			   const RealSpaceArrayDiffusion &Ex0,

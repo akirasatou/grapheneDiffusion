@@ -82,7 +82,7 @@ void GrapheneTransportSolver1D::_setInitialSteadyStateSCF()
 
   // Set the initial solutions to the holder.
 
-  _dsh.setInitialSolutions(_muElectron, _muHole, Ex, dEx_dx);
+  _pdm.setInitialSolutions(_muElectron, _muHole, Ex, dEx_dx);
 
 
   // Output the field and concentration.

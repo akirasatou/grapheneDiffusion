@@ -2,7 +2,7 @@
 #include "DiffusionSolver1DDescriptor.h"
 #include "RealSpaceGridHandler.h"
 #include "DiffusionABCalculator.h"
-#include "DiffusionSolutionHolder.h"
+#include "PoissonDiffusionMediator.h"
 #include "ResidualAndJacobianDiffusion.h"
 #include <Transistor2D/PoissonSolver2D.h>
 #include <libmesh.h>
@@ -24,7 +24,7 @@ public:
 
   DiffusionSolver1D(const DiffusionSolver1DDescriptor &difDsc,
 		    const DiffusionABCalculator &ab,
-		    DiffusionSolutionHolder &dsh,
+		    PoissonDiffusionMediator &pdm,
 		    double xl, double xr);
   ~DiffusionSolver1D();
   RealSpaceGridHandler getRealSGH();
@@ -40,7 +40,7 @@ private:
   //MeshRefinement _mRef;
   const DiffusionSolver1DDescriptor &_difDsc;
   const DiffusionABCalculator &_ab;
-  DiffusionSolutionHolder &_dsh;
+  PoissonDiffusionMediator &_pdm;
   ResidualAndJacobianDiffusion *_rj;
   double _Xl, _Xr;
 

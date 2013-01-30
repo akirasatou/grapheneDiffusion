@@ -9,10 +9,10 @@ using namespace std;
 
 ResidualAndJacobianDiffusion::
 ResidualAndJacobianDiffusion(const DiffusionABCalculator &ab,
-			     DiffusionSolutionHolder &dsh,
+			     PoissonDiffusionMediator &pdm,
 			     const MeshBase &meshBase,
 			     const DofMap &dofMap):
-  _ab(ab), _dsh(dsh), _meshBaseRef(&meshBase),
+  _ab(ab), _pdm(pdm), _meshBaseRef(&meshBase),
   _dofMapRef(&dofMap), _doOnceFlag(false)
 {
 }
@@ -83,13 +83,13 @@ _setNextSolutionsInNonlinearIteration(const NumericVector<Number> &U,
 
   // Save current solutions in nonlinear iteration and 
 
-  _dsh.shiftSolutionsInNonlinearIteration();
+  _pdm.shiftSolutionsInNonlinearIteration();
 
 
   // Calculate $\mu_{r,n+1}^{(l+1)}$ from $U$.
 
   // Calculate $E_{x,n+1}^{(l+1)}$ from $\mu_{r,n+1}^{(l+1)}$.
 
-  _dsh.updateSolutionsInNonlinearIteration();
+  _pdm.updateSolutionsInNonlinearIteration();
 
 }

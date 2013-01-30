@@ -18,9 +18,9 @@ GrapheneTransportSolver1D(const PoissonSolver2DDescriptor &poiDsc,
 			  const DiffusionSolver1DDescriptor &difDsc,
 			  const OutputDirectoryManager &odm):
   _poiDsc(poiDsc), _difDsc(difDsc), _poisson(poiDsc),
-  _diffusion(_difDsc, _ab, _dsh, _poiDsc.getXlPoisson(), _poiDsc.getXrPoisson()),
+  _diffusion(_difDsc, _ab, _pdm, _poiDsc.getXlPoisson(), _poiDsc.getXrPoisson()),
   _realSGH(_diffusion.getRealSGH()),
-  _ab(_difDsc.getT(), _difDsc.get_alpha()), _dsh(_realSGH, _poisson),
+  _ab(_difDsc.getT(), _difDsc.get_alpha()), _pdm(_realSGH, _poisson),
   _SigmaElectron(_realSGH), _SigmaHole(_realSGH),
   _SigmaDope(_realSGH), _Ex(_realSGH),
   _muElectron(_realSGH), _muHole(_realSGH),
@@ -113,7 +113,7 @@ void GrapheneTransportSolver1D::solveStep()
 
   // Get the current solutions from the holder.
 
-  _dsh.getCurrentSolutions(_muElectron, _muHole, _Ex);
+  _pdm.getCurrentSolutions(_muElectron, _muHole, _Ex);
 
 
   // Output.

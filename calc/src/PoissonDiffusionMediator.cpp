@@ -1,4 +1,4 @@
-#include "DiffusionSolutionHolder.h"
+#include "PoissonDiffusionMediator.h"
 
 using namespace std;
 
@@ -7,9 +7,9 @@ using namespace std;
  * Constructor.
  */
 
-DiffusionSolutionHolder::
-DiffusionSolutionHolder(const RealSpaceGridHandler &realSGH,
-			PoissonSolver2D &poisson):
+PoissonDiffusionMediator::
+PoissonDiffusionMediator(const RealSpaceGridHandler &realSGH,
+			 PoissonSolver2D &poisson):
   _mue_n(realSGH), _mue_n1_l(realSGH), _mue_n1_l1(realSGH),
   _muh_n(realSGH), _muh_n1_l(realSGH), _muh_n1_l1(realSGH),
   _Ex_n(realSGH), _Ex_n1_l(realSGH), _Ex_n1_l1(realSGH),
@@ -24,7 +24,7 @@ DiffusionSolutionHolder(const RealSpaceGridHandler &realSGH,
  * and $dE_{x,0}/dx$.
  */
 
-void DiffusionSolutionHolder::
+void PoissonDiffusionMediator::
 setInitialSolutions(const RealSpaceArrayDiffusion &mue0,
 		    const RealSpaceArrayDiffusion &muh0,
 		    const RealSpaceArrayDiffusion &Ex0,
@@ -45,7 +45,7 @@ setInitialSolutions(const RealSpaceArrayDiffusion &mue0,
  * Get the current solutions $\mu_{r,n}$, $E_{x,n}$.
  */
 
-void DiffusionSolutionHolder::
+void PoissonDiffusionMediator::
 getCurrentSolutions(RealSpaceArrayDiffusion &mue,
 		    RealSpaceArrayDiffusion &muh,
 		    RealSpaceArrayDiffusion &Ex) const
@@ -64,7 +64,7 @@ getCurrentSolutions(RealSpaceArrayDiffusion &mue,
  * Set the current time and the increment to the next time step.
  */
 
-void DiffusionSolutionHolder::setTime(double t, double dt)
+void PoissonDiffusionMediator::setTime(double t, double dt)
 {
   _t = t;
   _dt = dt;
@@ -75,7 +75,7 @@ void DiffusionSolutionHolder::setTime(double t, double dt)
  * Update the solutions to the next time step.
  */
 
-void DiffusionSolutionHolder::updateSolutions()
+void PoissonDiffusionMediator::updateSolutions()
 {
   const int n = _mue_n.getSize();
 
@@ -93,7 +93,7 @@ void DiffusionSolutionHolder::updateSolutions()
  * the nonlinear iteration: $\mu_{r, n+1}^{(l=0)} <- \mu_{r,n}$.
  */
 
-void DiffusionSolutionHolder::
+void PoissonDiffusionMediator::
 setInitialSolutionsInNonlinearIteration()
 {
   const int n = _mue_n.getSize();
@@ -110,7 +110,7 @@ setInitialSolutionsInNonlinearIteration()
  * Shift to the next nonlinear iteration.
  */
 
-void DiffusionSolutionHolder::shiftSolutionsInNonlinearIteration()
+void PoissonDiffusionMediator::shiftSolutionsInNonlinearIteration()
 {
   const int n = _mue_n.getSize();
 
@@ -127,7 +127,7 @@ void DiffusionSolutionHolder::shiftSolutionsInNonlinearIteration()
  * Update the solutions in nonlinear iteration.
  */
 
-void DiffusionSolutionHolder::updateSolutionsInNonlinearIteration()
+void PoissonDiffusionMediator::updateSolutionsInNonlinearIteration()
 {
   // Calculate the charge density from $\mu_{r,n+1}^{(l+1)}$.
 
