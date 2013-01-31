@@ -40,7 +40,6 @@ private:
   const MeshBase *_meshBaseRef;
   const DofMap *_dofMapRef;
   double _t, _dt;
-  bool _doOnceFlag;
 
   void _setNextSolutionsInNonlinearIteration(const NumericVector<Number> &U,
 					     NonlinearImplicitSystem &sys);
