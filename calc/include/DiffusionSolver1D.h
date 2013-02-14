@@ -27,7 +27,7 @@ public:
 		    PoissonDiffusionMediator &pdm,
 		    double xl, double xr);
   ~DiffusionSolver1D();
-  RealSpaceGridHandler getRealSGH();
+  RealSpaceGridHandler getRealSGH() const;
   void solveStep(double t, double dt);
 
 

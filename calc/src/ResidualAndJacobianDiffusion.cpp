@@ -21,9 +21,10 @@ ResidualAndJacobianDiffusion::
 ResidualAndJacobianDiffusion(const DiffusionABCalculator &ab,
 			     PoissonDiffusionMediator &pdm,
 			     const MeshBase &meshBase,
-			     const DofMap &dofMap):
+			     const DofMap &dofMap,
+			     const RealSpaceGridHandler &realSGH):
   _ab(ab), _pdm(pdm), _meshBaseRef(&meshBase),
-  _dofMapRef(&dofMap)
+  _dofMapRef(&dofMap), _mue(realSGH), _muh(realSGH), _realSGH(realSGH)
 {
 }
 
@@ -238,15 +239,62 @@ _setNextSolutionsInNonlinearIteration(const NumericVector<Number> &U,
 				      NonlinearImplicitSystem &sys)
 {
 
-  // Save current solutions in nonlinear iteration and 
-
-  _pdm.shiftSolutionsInNonlinearIteration();
-
-
   // Calculate $\mu_{r,n+1}^{(l+1)}$ from $U$.
+
+  const unsigned int dim = _meshBaseRef->mesh_dimension();
+  FEType feType = _dofMapRef->variable_type(0);
+    
+  AutoPtr<FEBase> fe(FEBase::build(dim, feType));
+  QGauss qrule(dim, FIFTH);
+  fe->attach_quadrature_rule(&qrule);
+  const vector<vector<Real> > &phi = fe->get_phi();
+
+  const unsigned int id_e = sys.variable_number("mu_e");
+  const unsigned int id_h = sys.variable_number("mu_h");
+
+  MeshBase::const_element_iterator el = _meshBaseRef->active_elements_begin();
+  const MeshBase::const_element_iterator end_el = _meshBaseRef->active_elements_end();
+
+  for(int iElem=0; el!=end_el; ++el, ++iElem){
+    std::vector<unsigned int> dofInd, dofInd_e, dofInd_h;
+
+    _dofMapRef->dof_indices(*el, dofInd);
+    _dofMapRef->dof_indices(*el, dofInd_e, id_e);
+    _dofMapRef->dof_indices(*el, dofInd_h, id_h);
+
+    const unsigned int nDofs = dofInd.size();
+    const unsigned int nDofs_e = dofInd_e.size();
+    const unsigned int nDofs_h = dofInd_h.size();
+
+    vector<double> tmp = _realSGH.getPointsInElem(iElem);
+    vector<Point> qps(tmp.size()), v;
+
+    for(int i=0; i<qps.size(); i++) qps[i] = Point(tmp[i]);
+
+    FE<1, LAGRANGE>::inverse_map(*el, qps, v);
+    fe->reinit(*el, &v);
+
+    for(unsigned int j=0; j<qps.size(); j++){
+      int i = _realSGH.getPointInvID(iElem, j);
+
+      _mue.setAt(i, 0.0);
+
+      for(unsigned int k=0; k<dofInd_e.size(); k++){
+	_mue.addAt(i, phi[k][j]*U(dofInd_e[k]));
+      }
+
+      _muh.setAt(i, 0.0);
+
+      for(unsigned int k=0; k<dofInd_e.size(); k++){
+	_muh.addAt(i, phi[k][j]*U(dofInd_e[k]));
+      }
+    }
+
+  }
+
 
   // Calculate $E_{x,n+1}^{(l+1)}$ from $\mu_{r,n+1}^{(l+1)}$.
 
-  _pdm.updateSolutionsInNonlinearIteration();
+  _pdm.updateSolutionsInNonlinearIteration(_mue, _muh);
 
 }

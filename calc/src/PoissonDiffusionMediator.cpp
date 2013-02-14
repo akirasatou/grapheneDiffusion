@@ -107,11 +107,16 @@ setInitialSolutionsInNonlinearIteration()
 
 
 /*
- * Shift to the next nonlinear iteration.
+ * Update the solutions in nonlinear iteration.
  */
 
-void PoissonDiffusionMediator::shiftSolutionsInNonlinearIteration()
+void PoissonDiffusionMediator::
+updateSolutionsInNonlinearIteration(const RealSpaceArrayDiffusion &mue,
+				    const RealSpaceArrayDiffusion &muh)
 {
+
+  // Shift the old solutions.
+
   const int n = _mue_n.getSize();
 
   for(int i=0; i<n; i++){
@@ -119,16 +124,12 @@ void PoissonDiffusionMediator::shiftSolutionsInNonlinearIteration()
     _muh_n1_l.setAt(i, _muh_n1_l1.getAt(i));
     _Ex_n1_l.setAt(i, _Ex_n1_l1.getAt(i));
     _dEx_dx_n1_l.setAt(i, _dEx_dx_n1_l1.getAt(i));
+
+    _mue_n1_l1.setAt(i, mue.getAt(i));
+    _muh_n1_l1.setAt(i, muh.getAt(i));
   }
-}
 
 
-/*
- * Update the solutions in nonlinear iteration.
- */
-
-void PoissonDiffusionMediator::updateSolutionsInNonlinearIteration()
-{
   // Calculate the charge density from $\mu_{r,n+1}^{(l+1)}$.
 
   // Calculate $E_{x,n+1}^{(l+1)}$ and $dE_{x,n+1}^{(l+1)}/dx$.

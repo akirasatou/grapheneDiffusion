@@ -22,8 +22,7 @@ public:
 
   void setTime(double t, double dt);
   void setInitialSolutionsInNonlinearIteration();
-  void shiftSolutionsInNonlinearIteration();
-  void updateSolutionsInNonlinearIteration();
+  void updateSolutionsInNonlinearIteration(const RealSpaceArrayDiffusion &mue, const RealSpaceArrayDiffusion &muh);
 
 
 private:

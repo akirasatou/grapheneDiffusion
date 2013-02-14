@@ -81,7 +81,7 @@ private:
   int _nSteps;
 
   OutputDirectoryManager _odm;
-  std::string _SSDir, _concDir, _pot2DDir, _fieldDir, _velDir;
+  std::string _SSDir, _muDir, _concDir, _pot2DDir, _fieldDir, _velDir;
 
   void _initPoissonSolver();
   void _refineMesh();

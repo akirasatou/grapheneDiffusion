@@ -23,13 +23,14 @@ public:
   double getXl() const;
   double getXr() const;
   std::pair<int, int> getPointID(int i) const;
+  std::vector<double> getPointsInElem(int iElem) const;
   int getPointInvID(int iElem, int qp) const;
 
 
 private:
 
-  std::vector<double> _x;
-  std::vector<std::pair<int, int> > _ID;
-  std::vector<std::vector<int> > _invID;
+  std::vector<double> _x; // x-grid in ascending order.
+  std::vector<std::pair<int, int> > _ID; // ID (iElem, qp) for x.
+  std::vector<std::vector<int> > _invID; // Index of x for ID (iElem, qp).
 
 };

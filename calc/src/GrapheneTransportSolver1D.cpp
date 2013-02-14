@@ -49,6 +49,9 @@ GrapheneTransportSolver1D(const PoissonSolver2DDescriptor &poiDsc,
   if( _difDsc.toOutputSS() ){
     _odm.push(string("SS")); _SSDir = _odm.pop();
   }
+  if( _difDsc.toOutputSS() ){
+    _odm.push(string("mu")); _muDir = _odm.pop();
+  }
   if( _difDsc.toOutputConcentration() ){
     _odm.push(string("conc")); _concDir = _odm.pop();
   }
@@ -134,7 +137,7 @@ void GrapheneTransportSolver1D::solveStep()
   if(_nSteps%n_output_step == 0){
     if( _difDsc.toOutputFermiLevel() ){
       sprintf(filehead, "mu-t=%04.0ffs", s2fs(t));
-      outputFermiLevel2DEG(_concDir.c_str(), filehead);
+      outputFermiLevel2DEG(_muDir.c_str(), filehead);
     }
     if( _difDsc.toOutputConcentration() ){
       sprintf(filehead, "conc-t=%04.0ffs", s2fs(t));

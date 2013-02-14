@@ -4,6 +4,7 @@
 #include "sparse_matrix.h"
 #include "DiffusionABCalculator.h"
 #include "PoissonDiffusionMediator.h"
+#include "RealSpaceArrayDiffusion.h"
 #include <Transistor2D/PoissonSolver2D.h>
 
 
@@ -21,7 +22,8 @@ public:
   ResidualAndJacobianDiffusion(const DiffusionABCalculator &ab,
 			       PoissonDiffusionMediator &pdm,
 			       const MeshBase &meshBase,
-			       const DofMap &dofMap);
+			       const DofMap &dofMap,
+			       const RealSpaceGridHandler &realSGH);
   void residual(const NumericVector<Number> &U,
                 NumericVector<Number> &R,
 		NonlinearImplicitSystem &sys);
@@ -39,6 +41,8 @@ private:
   PoissonDiffusionMediator &_pdm;
   const MeshBase *_meshBaseRef;
   const DofMap *_dofMapRef;
+  RealSpaceArrayDiffusion _mue, _muh;
+  RealSpaceGridHandler _realSGH;
   double _t, _dt;
 
   void _setNextSolutionsInNonlinearIteration(const NumericVector<Number> &U,

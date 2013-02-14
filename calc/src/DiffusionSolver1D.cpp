@@ -59,14 +59,6 @@ DiffusionSolver1D(const DiffusionSolver1DDescriptor &difDsc,
 
   sys.assemble_before_solve = false;
 
-
-  // Set residual_and_jacobian_object.
-
-  _rj = new ResidualAndJacobianDiffusion(_ab, _pdm, _es.get_mesh(),
-					 sys.get_dof_map());
-  sys.nonlinear_solver->residual_object = _rj;
-  sys.nonlinear_solver->jacobian_object = _rj;
-
   
   // Initialize the equation systems.
 
@@ -96,6 +88,15 @@ DiffusionSolver1D(const DiffusionSolver1DDescriptor &difDsc,
   _es.parameters.set<Real>("dt") = _difDsc.get_dt();
   _es.parameters.set<Real>("nonlinear solver relative step tolerance") = 1e-5;
   _es.parameters.set<unsigned int>("nonlinear solver maximum iterations") = 100;
+
+
+  // Set residual_and_jacobian_object.
+
+  _rj = new ResidualAndJacobianDiffusion(_ab, _pdm, _es.get_mesh(),
+					 sys.get_dof_map(),
+					 getRealSGH());
+  sys.nonlinear_solver->residual_object = _rj;
+  sys.nonlinear_solver->jacobian_object = _rj;
 
 }
 
@@ -170,9 +171,9 @@ void DiffusionSolver1D::_setBoundaryID()
  * Return RealSpaceGridHandler object.
  */
 
-RealSpaceGridHandler DiffusionSolver1D::getRealSGH()
+RealSpaceGridHandler DiffusionSolver1D::getRealSGH() const
 {
-  TransientNonlinearImplicitSystem &sys = _es.get_system<TransientNonlinearImplicitSystem>(_sysName);
+  const TransientNonlinearImplicitSystem &sys = _es.get_system<TransientNonlinearImplicitSystem>(_sysName);
   const DofMap &dofMap = sys.get_dof_map();
   const unsigned int dim = _mesh.mesh_dimension();
   FEType feType = dofMap.variable_type(0);
@@ -184,9 +185,7 @@ RealSpaceGridHandler DiffusionSolver1D::getRealSGH()
   MeshBase::const_element_iterator el = _mesh.active_elements_begin();
   const MeshBase::const_element_iterator end_el = _mesh.active_elements_end();
   
-  vector<vector<double> > x;
-
-  x.resize(_mesh.n_active_elem());
+  vector<vector<double> > x(_mesh.n_active_elem());
 
   for(int iElem=0; el!=end_el; ++el, ++iElem){
     const Elem *elem = *el;

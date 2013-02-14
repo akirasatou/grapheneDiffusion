@@ -99,3 +99,32 @@ pair<int, int> RealSpaceGridHandler::getPointID(int i) const
 
   return _ID[i];
 }
+
+int RealSpaceGridHandler::getPointInvID(int iElem, int qp) const
+{
+  if( iElem<0 || iElem>=_invID.size() ){
+    cerr << "RealSpaceGridHandler::getPointInvID: index out of range";
+    cerr << ": " << iElem << endl;
+    exit(1);
+  }
+
+  return _invID[iElem][qp];
+}
+
+
+vector<double> RealSpaceGridHandler::getPointsInElem(int iElem) const
+{
+  if( iElem<0 || iElem>=_invID.size() ){
+    cerr << "RealSpaceGridHandler::getPointsInElem: index out of ";
+    cerr << "range: " << iElem << endl;
+    exit(1);
+  }
+
+  vector<double> v(_invID[iElem].size());
+
+  for(int i=0; i<_invID[iElem].size(); i++){
+    v[i] = _x[_invID[iElem][i]];
+  }
+
+  return v;
+}
