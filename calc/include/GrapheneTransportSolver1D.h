@@ -68,12 +68,13 @@ private:
   DiffusionSolver1D _diffusion;
   RealSpaceGridHandler _realSGH;
   DiffusionABCalculator _ab;
-  PoissonDiffusionMediator _pdm;
 
   RealSpaceArrayDiffusion _SigmaElectron, _SigmaHole, _SigmaDope;
   RealSpaceArrayDiffusion _Ex, _muElectron, _muHole;
 
   FermiDistrGraphene _fermiDistr;
+
+  PoissonDiffusionMediator _pdm;
 
   /*
   GridParameter _gridParam;

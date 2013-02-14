@@ -43,6 +43,7 @@ private:
   PoissonDiffusionMediator &_pdm;
   ResidualAndJacobianDiffusion *_rj;
   double _Xl, _Xr;
+  int _nSteps;
 
   enum BoundaryID { BoundaryIDNone, BoundaryIDLeft, BoundaryIDRight };
 

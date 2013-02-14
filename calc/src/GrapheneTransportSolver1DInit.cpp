@@ -49,9 +49,10 @@ void GrapheneTransportSolver1D::_initPoissonSolver()
     }
     
     ChargeDensity2D rho2D(se, sh, sDope);
+    double t0 = 0.0-fs2s(1);
     
     rho2D.updateInterpolator();
-    _poisson.solve(0.0, rho2D);
+    _poisson.solve(t0, rho2D);
     _refineMesh();
     
     sprintf(filehead, "phiInit-n=%d", 2*n);
@@ -71,7 +72,7 @@ void GrapheneTransportSolver1D::_initPoissonSolver()
     }
     
     rho2D.updateInterpolator();
-    _poisson.solve(0.0, rho2D);
+    _poisson.solve(t0, rho2D);
     _refineMesh();
     
     sprintf(filehead, "phiInit-n=%d", 2*n+1);

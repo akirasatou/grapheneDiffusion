@@ -34,11 +34,12 @@ const string DiffusionSolver1D::_className("DiffusionSolver1D");
 DiffusionSolver1D::
 DiffusionSolver1D(const DiffusionSolver1DDescriptor &difDsc,
 		  const DiffusionABCalculator &ab,
-		  PoissonDiffusionMediator &pdm, double xl, double xr):
+		  PoissonDiffusionMediator &pdm,
+		  double xl, double xr):
   _sysName(difDsc.getFileHeadStr()), _mesh(1), _es(_mesh),
   //_mRef(_mesh),
   _difDsc(difDsc), _ab(ab), _pdm(pdm),
-  _Xl(xl), _Xr(xr)
+  _Xl(xl), _Xr(xr), _nSteps(0)
 {
 
   // Generate a uniform mesh. Each element has 3 interior points.

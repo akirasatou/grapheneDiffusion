@@ -285,8 +285,8 @@ _setNextSolutionsInNonlinearIteration(const NumericVector<Number> &U,
 
       _muh.setAt(i, 0.0);
 
-      for(unsigned int k=0; k<dofInd_e.size(); k++){
-	_muh.addAt(i, phi[k][j]*U(dofInd_e[k]));
+      for(unsigned int k=0; k<dofInd_h.size(); k++){
+	_muh.addAt(i, phi[k][j]*U(dofInd_h[k]));
       }
     }
 

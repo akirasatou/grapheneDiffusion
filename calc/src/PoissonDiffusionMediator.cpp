@@ -1,4 +1,5 @@
 #include "PoissonDiffusionMediator.h"
+#include "ChargeDensity2D.h"
 
 using namespace std;
 
@@ -9,13 +10,19 @@ using namespace std;
 
 PoissonDiffusionMediator::
 PoissonDiffusionMediator(const RealSpaceGridHandler &realSGH,
-			 PoissonSolver2D &poisson):
+			 PoissonSolver2D &poisson,
+			 const RealSpaceArrayDiffusion &SigmaDope,
+			 const FermiDistrGraphene &fermiDistr):
   _mue_n(realSGH), _mue_n1_l(realSGH), _mue_n1_l1(realSGH),
   _muh_n(realSGH), _muh_n1_l(realSGH), _muh_n1_l1(realSGH),
   _Ex_n(realSGH), _Ex_n1_l(realSGH), _Ex_n1_l1(realSGH),
   _dEx_dx_n(realSGH), _dEx_dx_n1_l(realSGH), _dEx_dx_n1_l1(realSGH),
-  _poisson(poisson)
+  _SigmaDope(realSGH), _poisson(poisson),
+  _realSGH(realSGH), _fermiDistr(fermiDistr)
 {
+  for(int i=0; i<_SigmaDope.getSize(); i++){
+    _SigmaDope.setAt(i, SigmaDope.getAt(i));
+  }
 }
 
 
@@ -132,11 +139,19 @@ updateSolutionsInNonlinearIteration(const RealSpaceArrayDiffusion &mue,
 
   // Calculate the charge density from $\mu_{r,n+1}^{(l+1)}$.
 
+  RealSpaceArrayDiffusion se(_realSGH), sh(_realSGH);
+  ChargeDensity2D rho2D(se, sh, _SigmaDope);
+
+  for(int i=0; i<_realSGH.getSize(); i++){
+    se.setAt(i, _fermiDistr.calcConcentrationFermiExact(_mue_n1_l1.getAt(i)));
+    sh.setAt(i, _fermiDistr.calcConcentrationFermiExact(_muh_n1_l1.getAt(i)));
+  }
+
+  rho2D.updateInterpolator();
+
+
   // Calculate $E_{x,n+1}^{(l+1)}$ and $dE_{x,n+1}^{(l+1)}/dx$.
 
-  // rho2D
-  //_poisson.solveAndCalcField2DEG(_t, _Ex_n1_l1, _dEx_dx_n1_l1,
-  //rho2D);
-
+  _poisson.solveAndCalcField2DEG(_t, _Ex_n1_l1, _dEx_dx_n1_l1, rho2D);
 
 }
