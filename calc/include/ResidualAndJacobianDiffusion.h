@@ -1,7 +1,10 @@
 #pragma once
 #include "nonlinear_implicit_system.h"
+#include "elem.h"
 #include "mesh_base.h"
 #include "sparse_matrix.h"
+#include "dense_submatrix.h"
+#include "dense_subvector.h"
 #include "DiffusionABCalculator.h"
 #include "PoissonDiffusionMediator.h"
 #include "RealSpaceArrayDiffusion.h"
@@ -41,11 +44,22 @@ private:
   PoissonDiffusionMediator &_pdm;
   const MeshBase *_meshBaseRef;
   const DofMap *_dofMapRef;
-  RealSpaceArrayDiffusion _mue, _muh;
+  RealSpaceArrayDiffusion _mue, _dmue_dx, _d2mue_dx2;
+  RealSpaceArrayDiffusion _muh, _dmuh_dx, _d2muh_dx2;
+  RealSpaceArrayDiffusion _Ex, _dEx_dx;
   RealSpaceGridHandler _realSGH;
   double _t, _dt;
 
   void _setNextSolutionsInNonlinearIteration(const NumericVector<Number> &U,
 					     NonlinearImplicitSystem &sys);
+
+  void _addK(DenseSubMatrix<Number> &K, const Elem *elem, int iElem,
+	     const std::vector<unsigned int> &dofInd, int s) const;
+  void _add_dKdU_U(DenseSubMatrix<Number> &dKdU, const Elem *elem, 
+		   int iElem, const NumericVector<Number> &U,
+		   const std::vector<unsigned int> &dofInd,
+		   int s) const;
+  void _addF(DenseSubVector<Number> &F, const Elem *elem, int iElem,
+	     const std::vector<unsigned int> &dofInd, int s) const;
 
 };

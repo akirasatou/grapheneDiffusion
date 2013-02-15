@@ -1,3 +1,4 @@
+#include <PhysicalConstants.h>
 #include "ResidualAndJacobianDiffusion.h"
 #include "fe.h"
 #include "elem.h"
@@ -23,8 +24,10 @@ ResidualAndJacobianDiffusion(const DiffusionABCalculator &ab,
 			     const MeshBase &meshBase,
 			     const DofMap &dofMap,
 			     const RealSpaceGridHandler &realSGH):
-  _ab(ab), _pdm(pdm), _meshBaseRef(&meshBase),
-  _dofMapRef(&dofMap), _mue(realSGH), _muh(realSGH), _realSGH(realSGH)
+  _ab(ab), _pdm(pdm), _meshBaseRef(&meshBase), _dofMapRef(&dofMap),
+  _mue(realSGH), _dmue_dx(realSGH), _d2mue_dx2(realSGH),
+  _muh(realSGH), _dmuh_dx(realSGH), _d2muh_dx2(realSGH),
+  _Ex(realSGH), _dEx_dx(realSGH), _realSGH(realSGH)
 {
 }
 
@@ -65,7 +68,7 @@ residual(const NumericVector<Number> &U, NumericVector<Number> &R,
   DenseMatrix<Number> Ke;
   DenseVector<Number> Fe, Ue, Re;
 
-  DenseSubMatrix<Number> Kee(Ke), Khh(Ke); // Keh(Ke), Khe(Ke), 
+  DenseSubMatrix<Number> Kee(Ke), Khh(Ke);
   DenseSubVector<Number> Fee(Fe), Fhh(Fhh);
 
 
@@ -91,14 +94,10 @@ residual(const NumericVector<Number> &U, NumericVector<Number> &R,
     Ke.resize(nDofs, nDofs);
     Ke.zero();
     Kee.reposition(id_e*nDofs_e, id_e*nDofs_e, nDofs_e, nDofs_e);
-    //Keh.reposition(id_e*nDofs_e, id_h*nDofs_h, nDofs_e, nDofs_h);
-    //Khe.reposition(id_h*nDofs_h, id_e*nDofs_e, nDofs_h, nDofs_e);
     Khh.reposition(id_h*nDofs_h, id_h*nDofs_h, nDofs_h, nDofs_h);
-    //Keh.zero();
-    //Khe.zero();
 
-    // assembleMatrixInElement(_t, Kee, *el, dofInd_e, -1);
-    // assembleMatrixInElement(_t, Khh, *el, dofInd_h, +1);
+    _addK(Kee, *el, iElem, dofInd_e, -1);
+    _addK(Khh, *el, iElem, dofInd_h, +1);
 
 
     // Setup Ue.
@@ -123,8 +122,8 @@ residual(const NumericVector<Number> &U, NumericVector<Number> &R,
     Fee.reposition(id_e*nDofs_e, nDofs_e);
     Fhh.reposition(id_e*nDofs_h, nDofs_h);
 
-    //_assmNSS.assembleVectorInElement(_t, Fee, *el, dofInd_e, -1);
-    //_assmNSS.assembleVectorInElement(_t, Fhh, *el, dofInd_h, +1);
+    _addF(Fee, *el, iElem, dofInd_e, -1);
+    _addF(Fhh, *el, iElem, dofInd_h, +1);
 
     for(int i=0; i<nDofs; i++) Re(i) -= Fe(i);
 
@@ -163,10 +162,7 @@ jacobian(const NumericVector<Number> &U, SparseMatrix<Number> &J,
   //         |K_{he}^{e} K_{hh}^{e}| where K_{eh}^{e}=K_{he}^{e}=0.
 
   DenseMatrix<Number> Je;
-  DenseVector<Number> Ue;
-
   DenseSubMatrix<Number> Jee(Je), Jhh(Je); // Jeh(Je), Jhe(Je),
-  DenseVector<Number> Uee(Ue), Uhh(Ue);
 
 
   // Loop for each element.
@@ -191,27 +187,16 @@ jacobian(const NumericVector<Number> &U, SparseMatrix<Number> &J,
     Je.resize(nDofs, nDofs);
     Je.zero();
     Jee.reposition(id_e*nDofs_e, id_e*nDofs_e, nDofs_e, nDofs_e);
-    //Jeh.reposition(id_e*nDofs_e, id_h*nDofs_h, nDofs_e, nDofs_h);
-    //Jhe.reposition(id_h*nDofs_h, id_e*nDofs_e, nDofs_h, nDofs_e);
     Jhh.reposition(id_h*nDofs_h, id_h*nDofs_h, nDofs_h, nDofs_h);
-    //Jeh.zero();
-    //Jhe.zero();
 
-    // assembleMatrixInElement(_t, Jee, *el, dofInd_e, -1);
-    // assembleMatrixInElement(_t, Jhh, *el, dofInd_h, +1);
+    _addK(Jee, *el, iElem, dofInd_e, -1);
+    _addK(Jhh, *el, iElem, dofInd_h, +1);
 
 
-    // Setup Ue.
+    // Je = Ke+dKe/dUe*Ue.
 
-    Ue.resize(nDofs);
-    Ue.zero();
-    for(unsigned int i=0; i<nDofs; i++) Ue(i) = U(dofInd[i]);
-
-
-    // Je = Ke-dKe/dUe*Ue.
-
-    // add_dKe_dUe(_t, Jee, *el, *dofInd_e, -1);
-    // add_dKe_dUe(_t, Jhh, *el, *dofInd_h, +1);
+    _add_dKdU_U(Jee, *el, iElem, U, dofInd_e, -1);
+    _add_dKdU_U(Jhh, *el, iElem, U, dofInd_h, +1);
   }
 }
 
@@ -248,6 +233,8 @@ _setNextSolutionsInNonlinearIteration(const NumericVector<Number> &U,
   QGauss qrule(dim, FIFTH);
   fe->attach_quadrature_rule(&qrule);
   const vector<vector<Real> > &phi = fe->get_phi();
+  const vector<vector<Real> > &dphidx = fe->get_dphidx();
+  const vector<vector<Real> > &d2phidx2 = fe->get_d2phidx2();
 
   const unsigned int id_e = sys.variable_number("mu_e");
   const unsigned int id_h = sys.variable_number("mu_h");
@@ -278,15 +265,23 @@ _setNextSolutionsInNonlinearIteration(const NumericVector<Number> &U,
       int i = _realSGH.getPointInvID(iElem, j);
 
       _mue.setAt(i, 0.0);
+      _dmue_dx.setAt(i, 0.0);
+      _d2mue_dx2.setAt(i, 0.0);
 
       for(unsigned int k=0; k<dofInd_e.size(); k++){
 	_mue.addAt(i, phi[k][j]*U(dofInd_e[k]));
+	_dmue_dx.addAt(i, dphidx[k][j]*U(dofInd_e[k]));
+	_d2mue_dx2.addAt(i, d2phidx2[k][j]*U(dofInd_e[k]));
       }
 
       _muh.setAt(i, 0.0);
+      _dmuh_dx.setAt(i, 0.0);
+      _d2muh_dx2.setAt(i, 0.0);
 
       for(unsigned int k=0; k<dofInd_h.size(); k++){
 	_muh.addAt(i, phi[k][j]*U(dofInd_h[k]));
+	_dmuh_dx.addAt(i, dphidx[k][j]*U(dofInd_h[k]));
+	_d2muh_dx2.addAt(i, d2phidx2[k][j]*U(dofInd_h[k]));
       }
     }
 
@@ -295,6 +290,144 @@ _setNextSolutionsInNonlinearIteration(const NumericVector<Number> &U,
 
   // Calculate $E_{x,n+1}^{(l+1)}$ from $\mu_{r,n+1}^{(l+1)}$.
 
-  _pdm.updateSolutionsInNonlinearIteration(_mue, _muh);
+  _pdm.updateSolutionsNI(_mue, _dmue_dx, _d2mue_dx2,
+			 _muh, _dmuh_dx, _d2muh_dx2);
 
+}
+
+
+/*
+ * Add the stiffness matrix $K$ for the element.
+ */
+
+void ResidualAndJacobianDiffusion::
+_addK(DenseSubMatrix<Number> &K, const Elem *elem, int iElem,
+      const std::vector<unsigned int> &dofInd, int s) const
+{
+  const unsigned int dim = _meshBaseRef->mesh_dimension();
+  FEType feType = _dofMapRef->variable_type(0);
+    
+  AutoPtr<FEBase> fe(FEBase::build(dim, feType));
+  QGauss qrule(dim, FIFTH);
+  fe->attach_quadrature_rule(&qrule);
+    
+  AutoPtr<FEBase> feFace(FEBase::build(dim, feType));
+  QGauss qface(dim-1, FIFTH);
+  feFace->attach_quadrature_rule(&qface);
+
+  fe->reinit(elem);
+
+  const vector<Real> &JxW = fe->get_JxW();
+  const vector<Point> &r = fe->get_xyz();
+  const vector<vector<Real> > &phi = fe->get_phi();
+  const vector<vector<RealGradient> > &dphi = fe->get_dphi();
+
+  for(unsigned int qp=0; qp<qrule.n_points(); qp++){
+    Real x = r[qp](0);
+
+    for(unsigned int i=0; i<phi.size(); i++){
+      for(unsigned int j=0; j<phi.size(); j++){
+	//Ke(i, j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+      }
+    }
+  }
+
+}
+
+
+/*
+ * Add the $\sum_{k}\frac{\p K_{ik}^{e}}{\p U_{j}^{e}}U_{k}^{e}$
+ * for the element.
+ */
+
+void ResidualAndJacobianDiffusion::
+_add_dKdU_U(DenseSubMatrix<Number> &dKdU, const Elem *elem, 
+	    int iElem, const NumericVector<Number> &U,
+	    const std::vector<unsigned int> &dofInd, int s) const
+{
+  const unsigned int dim = _meshBaseRef->mesh_dimension();
+  FEType feType = _dofMapRef->variable_type(0);
+    
+  AutoPtr<FEBase> fe(FEBase::build(dim, feType));
+  QGauss qrule(dim, FIFTH);
+  fe->attach_quadrature_rule(&qrule);
+    
+  AutoPtr<FEBase> feFace(FEBase::build(dim, feType));
+  QGauss qface(dim-1, FIFTH);
+  feFace->attach_quadrature_rule(&qface);
+
+  fe->reinit(elem);
+
+  const vector<Real> &JxW = fe->get_JxW();
+  const vector<Point> &r = fe->get_xyz();
+  const vector<vector<Real> > &phi = fe->get_phi();
+  const vector<vector<RealGradient> > &dphi = fe->get_dphi();
+
+  for(unsigned int qp=0; qp<qrule.n_points(); qp++){
+    Real x = r[qp](0);
+
+    for(unsigned int i=0; i<phi.size(); i++){
+      for(unsigned int j=0; j<phi.size(); j++){
+	//Ke(i, j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+      }
+    }
+  }
+}
+
+
+/*
+ * Add the load vector $F$ for the element.
+ */
+
+void ResidualAndJacobianDiffusion::
+_addF(DenseSubVector<Number> &F, const Elem *elem, int iElem,
+      const std::vector<unsigned int> &dofInd, int s) const
+{
+  const unsigned int dim = _meshBaseRef->mesh_dimension();
+  FEType feType = _dofMapRef->variable_type(0);
+    
+  AutoPtr<FEBase> fe(FEBase::build(dim, feType));
+  QGauss qrule(dim, FIFTH);
+  fe->attach_quadrature_rule(&qrule);
+    
+  AutoPtr<FEBase> feFace(FEBase::build(dim, feType));
+  QGauss qface(dim-1, FIFTH);
+  feFace->attach_quadrature_rule(&qface);
+
+  fe->reinit(elem);
+
+  const vector<Real> &JxW = fe->get_JxW();
+  const vector<Point> &r = fe->get_xyz();
+  const vector<vector<Real> > &phi = fe->get_phi();
+  const vector<vector<RealGradient> > &dphi = fe->get_dphi();
+
+  for(unsigned int qp=0; qp<qrule.n_points(); qp++){
+    int ir = _realSGH.getPointInvID(iElem, qp);
+    //Real x = r[qp](0);
+    double C = 0.0;
+    double mu_n, dmu_dx_n, d2mu_dx2_n, mu_n1_l1;
+    double Ex_n = _pdm.get_Ex_n(ir), dEx_dx_n = _pdm.get_dEx_dx_n(ir);
+    double dEx_dx_n1_l1 = _pdm.get_dEx_dx_n1_l1(ir);
+
+    if( s == -1 ){
+      mu_n = _pdm.get_mue_n(ir);
+      dmu_dx_n = _pdm.get_dmue_dx_n(ir);
+      d2mu_dx2_n = _pdm.get_d2mue_dx2_n(ir);
+      mu_n1_l1 = _pdm.get_mue_n1_l1(ir);
+    }
+    else {
+      mu_n = _pdm.get_muh_n(ir);
+      dmu_dx_n = _pdm.get_dmuh_dx_n(ir);
+      d2mu_dx2_n = _pdm.get_d2muh_dx2_n(ir);
+      mu_n1_l1 = _pdm.get_muh_n1_l1(ir);
+    }
+
+    C += mu_n-0.5*s*_dt*_ab.calcA(mu_n)*(e*Ex_n-s*dmu_dx_n)*dmu_dx_n;
+    C += 0.5*_dt*_ab.calcB(mu_n)*(d2mu_dx2_n-s*e*Ex_n);
+    C += -0.5*s*_dt*_ab.calcB(mu_n1_l1)*e*dEx_dx_n1_l1;
+
+    for(unsigned int i=0; i<phi.size(); i++){
+      F(i) += JxW[qp]*phi[i][qp]*C;
+    }
+  }
 }

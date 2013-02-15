@@ -14,7 +14,15 @@ PoissonDiffusionMediator(const RealSpaceGridHandler &realSGH,
 			 const RealSpaceArrayDiffusion &SigmaDope,
 			 const FermiDistrGraphene &fermiDistr):
   _mue_n(realSGH), _mue_n1_l(realSGH), _mue_n1_l1(realSGH),
+  _dmue_dx_n(realSGH), _dmue_dx_n1_l(realSGH),
+  _dmue_dx_n1_l1(realSGH),
+  _d2mue_dx2_n(realSGH), _d2mue_dx2_n1_l(realSGH),
+  _d2mue_dx2_n1_l1(realSGH),
   _muh_n(realSGH), _muh_n1_l(realSGH), _muh_n1_l1(realSGH),
+  _dmuh_dx_n(realSGH), _dmuh_dx_n1_l(realSGH),
+  _dmuh_dx_n1_l1(realSGH),
+  _d2muh_dx2_n(realSGH), _d2muh_dx2_n1_l(realSGH),
+  _d2muh_dx2_n1_l1(realSGH),
   _Ex_n(realSGH), _Ex_n1_l(realSGH), _Ex_n1_l1(realSGH),
   _dEx_dx_n(realSGH), _dEx_dx_n1_l(realSGH), _dEx_dx_n1_l1(realSGH),
   _SigmaDope(realSGH), _poisson(poisson),
@@ -45,6 +53,9 @@ setInitialSolutions(const RealSpaceArrayDiffusion &mue0,
     _Ex_n.setAt(i, Ex0.getAt(i));
     _dEx_dx_n.setAt(i, dEx_dx0.getAt(i));
   }
+
+  // Need to calculate $d\mu_{r}/dx$ and $d^{2}\mu_{r}/dx^{2}$
+  // from $\mu_{r}$.
 }
 
 
@@ -101,7 +112,7 @@ void PoissonDiffusionMediator::updateSolutions()
  */
 
 void PoissonDiffusionMediator::
-setInitialSolutionsInNonlinearIteration()
+setInitialSolutionsNI()
 {
   const int n = _mue_n.getSize();
 
@@ -118,8 +129,12 @@ setInitialSolutionsInNonlinearIteration()
  */
 
 void PoissonDiffusionMediator::
-updateSolutionsInNonlinearIteration(const RealSpaceArrayDiffusion &mue,
-				    const RealSpaceArrayDiffusion &muh)
+updateSolutionsNI(const RealSpaceArrayDiffusion &mue,
+		  const RealSpaceArrayDiffusion &dmue_dx,
+		  const RealSpaceArrayDiffusion &d2mue_dx2,
+		  const RealSpaceArrayDiffusion &muh,
+		  const RealSpaceArrayDiffusion &dmuh_dx,
+		  const RealSpaceArrayDiffusion &d2muh_dx2)
 {
 
   // Shift the old solutions.
@@ -128,12 +143,28 @@ updateSolutionsInNonlinearIteration(const RealSpaceArrayDiffusion &mue,
 
   for(int i=0; i<n; i++){
     _mue_n1_l.setAt(i, _mue_n1_l1.getAt(i));
+    _dmue_dx_n1_l.setAt(i, _dmue_dx_n1_l1.getAt(i));
+    _d2mue_dx2_n1_l.setAt(i, _d2mue_dx2_n1_l1.getAt(i));
+
     _muh_n1_l.setAt(i, _muh_n1_l1.getAt(i));
+    _dmuh_dx_n1_l.setAt(i, _dmuh_dx_n1_l1.getAt(i));
+    _d2muh_dx2_n1_l.setAt(i, _d2muh_dx2_n1_l1.getAt(i));
+
     _Ex_n1_l.setAt(i, _Ex_n1_l1.getAt(i));
     _dEx_dx_n1_l.setAt(i, _dEx_dx_n1_l1.getAt(i));
+  }
 
+
+  // Set the current $mu_{r}$ and their derivatives.
+
+  for(int i=0; i<n; i++){
     _mue_n1_l1.setAt(i, mue.getAt(i));
-    _muh_n1_l1.setAt(i, muh.getAt(i));
+    _dmue_dx_n1_l1.setAt(i, dmue_dx.getAt(i));
+    _d2mue_dx2_n1_l1.setAt(i, d2mue_dx2.getAt(i));
+
+    _muh_n1_l1.setAt(i, mue.getAt(i));
+    _dmuh_dx_n1_l1.setAt(i, dmuh_dx.getAt(i));
+    _d2muh_dx2_n1_l1.setAt(i, d2muh_dx2.getAt(i));
   }
 
 

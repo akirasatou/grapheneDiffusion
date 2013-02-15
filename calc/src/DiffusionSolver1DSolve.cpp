@@ -29,7 +29,7 @@ void DiffusionSolver1D::solveStep(double t, double dt)
   // Set the solutions of the previous time step as the start of
   // the nonlinear iteration: $\mu_{r, n+1}^{(l=0)} <- \mu_{r,n}$.
 
-  _pdm.setInitialSolutionsInNonlinearIteration();
+  _pdm.setInitialSolutionsNI();
 
 
   // Solve the diffusion equation by nonlinear Newton iteration.
