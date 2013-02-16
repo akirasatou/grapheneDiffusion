@@ -56,6 +56,46 @@ setInitialSolutions(const RealSpaceArrayDiffusion &mue0,
 
   // Need to calculate $d\mu_{r}/dx$ and $d^{2}\mu_{r}/dx^{2}$
   // from $\mu_{r}$.
+
+  for(int i=0; i<n; i++){
+    double mue_ip1, mue_im1, muh_ip1, muh_im1;
+    double h_i, h_im1;
+
+    if( i == 0 ){
+      mue_im1 = _mue_n.getAt(n-1);
+      muh_im1 = _muh_n.getAt(n-1);
+      h_im1 = _realSGH.getAt(n-1)-_realSGH.getAt(n-2);
+    }
+    else {
+      mue_im1 = _mue_n.getAt(i-1);
+      muh_im1 = _muh_n.getAt(i-1);
+      h_im1 = _realSGH.getAt(i)-_realSGH.getAt(i-1);
+    }
+
+    if( i == n-1 ){
+      mue_ip1 = _mue_n.getAt(0);
+      muh_ip1 = _muh_n.getAt(0);
+      h_i = _realSGH.getAt(1)-_realSGH.getAt(0);
+    }
+    else {
+      mue_ip1 = _mue_n.getAt(i+1);
+      muh_ip1 = _muh_n.getAt(i+1);
+      h_i = _realSGH.getAt(i+1)-_realSGH.getAt(i);
+    }
+
+    _dmue_dx_n.setAt(i, (mue_ip1-mue_im1)/(h_i+h_im1));
+    _dmuh_dx_n.setAt(i, (muh_ip1-muh_im1)/(h_i+h_im1));
+
+    double d2mue_dx2, d2muh_dx2;
+
+    d2mue_dx2 = (mue_ip1-_mue_n.getAt(i))/h_i;
+    d2mue_dx2 -= (_mue_n.getAt(i)-mue_im1)/h_im1;
+    d2mue_dx2 *= 0.5*(h_i+h_im1);
+
+    d2muh_dx2 = (muh_ip1-_muh_n.getAt(i))/h_i;
+    d2muh_dx2 -= (_muh_n.getAt(i)-muh_im1)/h_im1;
+    d2muh_dx2 *= 0.5*(h_i+h_im1);
+  }
 }
 
 
