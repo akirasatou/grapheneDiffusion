@@ -96,8 +96,8 @@ residual(const NumericVector<Number> &U, NumericVector<Number> &R,
     Kee.reposition(id_e*nDofs_e, id_e*nDofs_e, nDofs_e, nDofs_e);
     Khh.reposition(id_h*nDofs_h, id_h*nDofs_h, nDofs_h, nDofs_h);
 
-    _addK(Kee, *el, iElem, dofInd_e, -1);
-    _addK(Khh, *el, iElem, dofInd_h, +1);
+    _addK(Kee, *el, iElem, -1);
+    _addK(Khh, *el, iElem, +1);
 
 
     // Setup Ue.
@@ -122,8 +122,8 @@ residual(const NumericVector<Number> &U, NumericVector<Number> &R,
     Fee.reposition(id_e*nDofs_e, nDofs_e);
     Fhh.reposition(id_e*nDofs_h, nDofs_h);
 
-    _addF(Fee, *el, iElem, dofInd_e, -1);
-    _addF(Fhh, *el, iElem, dofInd_h, +1);
+    _addF(Fee, *el, iElem, -1);
+    _addF(Fhh, *el, iElem, +1);
 
     for(int i=0; i<nDofs; i++) Re(i) -= Fe(i);
 
@@ -146,7 +146,7 @@ jacobian(const NumericVector<Number> &U, SparseMatrix<Number> &J,
   // jacobian() is called first in the nonlinear iteration in libMesh.
   // Besides, residual() is called twice in one iteration.
 
-  _setNextSolutionsInNonlinearIteration(U, sys);
+  _setNextSolutionsNI(U, sys);
 
 
   // Numeric ids.
@@ -189,8 +189,8 @@ jacobian(const NumericVector<Number> &U, SparseMatrix<Number> &J,
     Jee.reposition(id_e*nDofs_e, id_e*nDofs_e, nDofs_e, nDofs_e);
     Jhh.reposition(id_h*nDofs_h, id_h*nDofs_h, nDofs_h, nDofs_h);
 
-    _addK(Jee, *el, iElem, dofInd_e, -1);
-    _addK(Jhh, *el, iElem, dofInd_h, +1);
+    _addK(Jee, *el, iElem, -1);
+    _addK(Jhh, *el, iElem, +1);
 
 
     // Je = Ke+dKe/dUe*Ue.
@@ -220,8 +220,8 @@ void ResidualAndJacobianDiffusion::setTime(double t, double dt)
  */
 
 void ResidualAndJacobianDiffusion::
-_setNextSolutionsInNonlinearIteration(const NumericVector<Number> &U,
-				      NonlinearImplicitSystem &sys)
+_setNextSolutionsNI(const NumericVector<Number> &U,
+		    NonlinearImplicitSystem &sys)
 {
 
   // Calculate $\mu_{r,n+1}^{(l+1)}$ from $U$.
@@ -302,7 +302,7 @@ _setNextSolutionsInNonlinearIteration(const NumericVector<Number> &U,
 
 void ResidualAndJacobianDiffusion::
 _addK(DenseSubMatrix<Number> &K, const Elem *elem, int iElem,
-      const std::vector<unsigned int> &dofInd, int s) const
+      int s) const
 {
   const unsigned int dim = _meshBaseRef->mesh_dimension();
   FEType feType = _dofMapRef->variable_type(0);
@@ -320,14 +320,36 @@ _addK(DenseSubMatrix<Number> &K, const Elem *elem, int iElem,
   const vector<Real> &JxW = fe->get_JxW();
   const vector<Point> &r = fe->get_xyz();
   const vector<vector<Real> > &phi = fe->get_phi();
-  const vector<vector<RealGradient> > &dphi = fe->get_dphi();
+  const vector<vector<Real> > &dphidx = fe->get_dphidx();
+  const vector<vector<Real> > &d2phidx2 = fe->get_d2phidx2();
 
   for(unsigned int qp=0; qp<qrule.n_points(); qp++){
-    Real x = r[qp](0);
+    int ir = _realSGH.getPointInvID(iElem, qp);
+    double C = 0.0;
+    double mu_n1_l1, dmu_dx_n1_l1;
+    double Ex_n1_l1 = _pdm.get_Ex_n1_l1(ir);
+
+    if( s == -1 ){
+      mu_n1_l1 = _pdm.get_mue_n1_l1(ir);
+      dmu_dx_n1_l1 = _pdm.get_dmue_dx_n1_l1(ir);
+    }
+    else {
+      mu_n1_l1 = _pdm.get_muh_n1_l1(ir);
+      dmu_dx_n1_l1 = _pdm.get_dmuh_dx_n1_l1(ir);
+    }
+
+    double A = _ab.calcA(mu_n1_l1);
+    double B = _ab.calcB(mu_n1_l1);
 
     for(unsigned int i=0; i<phi.size(); i++){
       for(unsigned int j=0; j<phi.size(); j++){
-	//Ke(i, j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+	double tmp = 0.0;
+
+	tmp += phi[j][qp];
+	tmp += 0.5*s*_dt*A*(e*Ex_n1_l1-s*dmu_dx_n1_l1)*dphidx[j][qp];
+	tmp += -0.5*_dt*B*d2phidx2[j][qp];
+
+	K(i, j) += JxW[qp]*phi[i][qp]*tmp;
       }
     }
   }
@@ -341,7 +363,7 @@ _addK(DenseSubMatrix<Number> &K, const Elem *elem, int iElem,
  */
 
 void ResidualAndJacobianDiffusion::
-_add_dKdU_U(DenseSubMatrix<Number> &dKdU, const Elem *elem, 
+_add_dKdU_U(DenseSubMatrix<Number> &K, const Elem *elem, 
 	    int iElem, const NumericVector<Number> &U,
 	    const std::vector<unsigned int> &dofInd, int s) const
 {
@@ -361,17 +383,46 @@ _add_dKdU_U(DenseSubMatrix<Number> &dKdU, const Elem *elem,
   const vector<Real> &JxW = fe->get_JxW();
   const vector<Point> &r = fe->get_xyz();
   const vector<vector<Real> > &phi = fe->get_phi();
-  const vector<vector<RealGradient> > &dphi = fe->get_dphi();
+  const vector<vector<Real> > &dphidx = fe->get_dphidx();
+  const vector<vector<Real> > &d2phidx2 = fe->get_d2phidx2();
 
   for(unsigned int qp=0; qp<qrule.n_points(); qp++){
-    Real x = r[qp](0);
+    int ir = _realSGH.getPointInvID(iElem, qp);
+    double mu_n1_l1, dmu_dx_n1_l1;
+    double Ex_n1_l1 = _pdm.get_Ex_n1_l1(ir);
+
+    if( s == -1 ){
+      mu_n1_l1 = _pdm.get_mue_n1_l1(ir);
+      dmu_dx_n1_l1 = _pdm.get_dmue_dx_n1_l1(ir);
+    }
+    else {
+      mu_n1_l1 = _pdm.get_muh_n1_l1(ir);
+      dmu_dx_n1_l1 = _pdm.get_dmuh_dx_n1_l1(ir);
+    }
+
+    double A = _ab.calcA(mu_n1_l1);
+    double dA_dmu = _ab.calc_dA_dmu(mu_n1_l1);
+    double dB_dmu = _ab.calc_dB_dmu(mu_n1_l1);
 
     for(unsigned int i=0; i<phi.size(); i++){
       for(unsigned int j=0; j<phi.size(); j++){
-	//Ke(i, j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
+	double a = 0.5*s*_dt*phi[j][qp]*dA_dmu*(e*Ex_n1_l1-s*dmu_dx_n1_l1);
+
+	for(unsigned int k=0; k<phi.size(); k++){
+	  double tmp = 0.0;
+	  double Uk = U(dofInd[k]); // ?
+
+	  tmp += a*dphidx[k][qp];
+	  tmp -= 0.5*_dt*A*dphidx[j][qp]*dphidx[k][qp];
+	  tmp -= 0.5*_dt*dB_dmu*phi[j][qp]*d2phidx2[k][qp];
+
+	  K(i, j) += JxW[qp]*phi[i][qp]*tmp*Uk;
+	}
       }
     }
   }
+
+
 }
 
 
@@ -381,7 +432,7 @@ _add_dKdU_U(DenseSubMatrix<Number> &dKdU, const Elem *elem,
 
 void ResidualAndJacobianDiffusion::
 _addF(DenseSubVector<Number> &F, const Elem *elem, int iElem,
-      const std::vector<unsigned int> &dofInd, int s) const
+      int s) const
 {
   const unsigned int dim = _meshBaseRef->mesh_dimension();
   FEType feType = _dofMapRef->variable_type(0);
@@ -399,11 +450,9 @@ _addF(DenseSubVector<Number> &F, const Elem *elem, int iElem,
   const vector<Real> &JxW = fe->get_JxW();
   const vector<Point> &r = fe->get_xyz();
   const vector<vector<Real> > &phi = fe->get_phi();
-  const vector<vector<RealGradient> > &dphi = fe->get_dphi();
 
   for(unsigned int qp=0; qp<qrule.n_points(); qp++){
     int ir = _realSGH.getPointInvID(iElem, qp);
-    //Real x = r[qp](0);
     double C = 0.0;
     double mu_n, dmu_dx_n, d2mu_dx2_n, mu_n1_l1;
     double Ex_n = _pdm.get_Ex_n(ir), dEx_dx_n = _pdm.get_dEx_dx_n(ir);

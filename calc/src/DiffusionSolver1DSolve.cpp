@@ -34,7 +34,7 @@ void DiffusionSolver1D::solveStep(double t, double dt)
 
   // Solve the diffusion equation by nonlinear Newton iteration.
 
-  // sys.solve();
+  sys.solve();
 
 
   // Update the solutions to the next time step.
