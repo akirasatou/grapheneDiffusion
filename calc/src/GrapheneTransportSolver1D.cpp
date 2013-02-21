@@ -106,13 +106,13 @@ void GrapheneTransportSolver1D::solveStep()
 
   double t = getTime();
 
-  _diffusion.solveStep(t, _difDsc.get_dt());
-
   cerr << t << endl;
   for(int i=0; i<_poiDsc.getGates().size(); i++){
     cerr << _poiDsc.getGates()[i]->getVoltage(t) << " ";
   }
   cerr << endl;
+
+  _diffusion.solveStep(t, _difDsc.get_dt());
 
 
   // Get the current solutions from the holder.

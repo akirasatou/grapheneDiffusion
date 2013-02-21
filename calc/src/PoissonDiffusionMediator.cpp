@@ -1,5 +1,7 @@
 #include "PoissonDiffusionMediator.h"
 #include "ChargeDensity2D.h"
+#include <stdio.h>
+#include <PhysicalUnits.h>
 
 using namespace std;
 
@@ -92,10 +94,12 @@ setInitialSolutions(const RealSpaceArrayDiffusion &mue0,
     d2mue_dx2 = (mue_ip1-_mue_n.getAt(i))/h_i;
     d2mue_dx2 -= (_mue_n.getAt(i)-mue_im1)/h_im1;
     d2mue_dx2 *= 0.5*(h_i+h_im1);
+    _d2mue_dx2_n.setAt(i, d2mue_dx2);
 
     d2muh_dx2 = (muh_ip1-_muh_n.getAt(i))/h_i;
     d2muh_dx2 -= (_muh_n.getAt(i)-muh_im1)/h_im1;
     d2muh_dx2 *= 0.5*(h_i+h_im1);
+    _d2muh_dx2_n.setAt(i, d2muh_dx2);
   }
 }
 
@@ -140,7 +144,13 @@ void PoissonDiffusionMediator::updateSolutions()
 
   for(int i=0; i<n; i++){
     _mue_n.setAt(i, _mue_n1_l1.getAt(i));
+    _dmue_dx_n.setAt(i, _dmue_dx_n1_l1.getAt(i));
+    _d2mue_dx2_n.setAt(i, _d2mue_dx2_n1_l1.getAt(i));
+
     _muh_n.setAt(i, _muh_n1_l1.getAt(i));
+    _dmuh_dx_n.setAt(i, _dmuh_dx_n1_l1.getAt(i));
+    _d2muh_dx2_n.setAt(i, _d2muh_dx2_n1_l1.getAt(i));
+
     _Ex_n.setAt(i, _Ex_n1_l1.getAt(i));
     _dEx_dx_n.setAt(i, _dEx_dx_n1_l1.getAt(i));
   }
@@ -156,12 +166,78 @@ void PoissonDiffusionMediator::
 setInitialSolutionsNI()
 {
   const int n = _mue_n.getSize();
-
+  /*
   for(int i=0; i<n; i++){
     _mue_n1_l.setAt(i, _mue_n.getAt(i));
+    _dmue_dx_n1_l.setAt(i, _dmue_dx_n.getAt(i));
+    _d2mue_dx2_n1_l.setAt(i, _d2mue_dx2_n.getAt(i));
+
     _muh_n1_l.setAt(i, _muh_n.getAt(i));
+    _dmuh_dx_n1_l.setAt(i, _dmuh_dx_n.getAt(i));
+    _d2muh_dx2_n1_l.setAt(i, _d2muh_dx2_n.getAt(i));
+
     _Ex_n1_l.setAt(i, _Ex_n.getAt(i));
+    _dEx_dx_n1_l.setAt(i, _dEx_dx_n.getAt(i));
+
+    _mue_n1_l1.setAt(i, _mue_n.getAt(i));
+    _dmue_dx_n1_l1.setAt(i, _dmue_dx_n.getAt(i));
+    _d2mue_dx2_n1_l1.setAt(i, _d2mue_dx2_n.getAt(i));
+
+    _muh_n1_l1.setAt(i, _muh_n.getAt(i));
+    _dmuh_dx_n1_l1.setAt(i, _dmuh_dx_n.getAt(i));
+    _d2muh_dx2_n1_l1.setAt(i, _d2muh_dx2_n.getAt(i));
+
+    _Ex_n1_l1.setAt(i, _Ex_n.getAt(i));
+    _dEx_dx_n1_l1.setAt(i, _dEx_dx_n.getAt(i));
   }
+  */
+
+  for(int i=0; i<n; i++){
+    _mue_n1_l.setAt(i, 0.0);
+    _dmue_dx_n1_l.setAt(i, 0.0);
+    _d2mue_dx2_n1_l.setAt(i, 0.0);
+
+    _muh_n1_l.setAt(i, 0.0);
+    _dmuh_dx_n1_l.setAt(i, 0.0);
+    _d2muh_dx2_n1_l.setAt(i, 0.0);
+
+    _Ex_n1_l.setAt(i, 0.0);
+    _dEx_dx_n1_l.setAt(i, 0.0);
+
+    _mue_n1_l1.setAt(i, 0.0);
+    _dmue_dx_n1_l1.setAt(i, 0.0);
+    _d2mue_dx2_n1_l1.setAt(i, 0.0);
+
+    _muh_n1_l1.setAt(i, 0.0);
+    _dmuh_dx_n1_l1.setAt(i, 0.0);
+    _d2muh_dx2_n1_l1.setAt(i, 0.0);
+
+    _Ex_n1_l1.setAt(i, 0.0);
+    _dEx_dx_n1_l1.setAt(i, 0.0);
+  }
+
+  _nrStepsNI = 0;
+
+  FILE *f_mue, *f_muh, *f_Ex;
+  char filename[100];
+
+  sprintf(filename, "dat/mue-t=%05.1ffs-NI=0.dat", s2fs(_t));
+  f_mue = fopen(filename, "w");
+  sprintf(filename, "dat/muh-t=%05.1ffs-NI=0.dat", s2fs(_t));
+  f_muh = fopen(filename, "w");
+  sprintf(filename, "dat/Ex-t=%05.1ffs-NI=0.dat", s2fs(_t));
+  f_Ex = fopen(filename, "w");
+
+  for(int i=0; i<n; i++){
+    fprintf(f_mue, "%g %g\n", _realSGH.getAt(i), J2meV(_mue_n1_l.getAt(i)));
+    fprintf(f_muh, "%g %g\n", _realSGH.getAt(i), J2meV(_muh_n1_l.getAt(i)));
+    fprintf(f_Ex, "%g %g\n", _realSGH.getAt(i), _Ex_n1_l.getAt(i));
+  }
+
+  fclose(f_mue);
+  fclose(f_muh);
+  fclose(f_Ex);
+
 }
 
 
@@ -226,6 +302,25 @@ updateSolutionsNI(const RealSpaceArrayDiffusion &mue,
 
   _poisson.solveAndCalcField2DEG(_t, _Ex_n1_l1, _dEx_dx_n1_l1, rho2D);
 
+  _nrStepsNI++;
 
-  
+  FILE *f_mue, *f_muh, *f_Ex;
+  char filename[100];
+
+  sprintf(filename, "dat/mue-t=%05.1ffs-NI=%d.dat", s2fs(_t), _nrStepsNI);
+  f_mue = fopen(filename, "w");
+  sprintf(filename, "dat/muh-t=%05.1ffs-NI=%d.dat", s2fs(_t), _nrStepsNI);
+  f_muh = fopen(filename, "w");
+  sprintf(filename, "dat/Ex-t=%05.1ffs-NI=%d.dat", s2fs(_t), _nrStepsNI);
+  f_Ex = fopen(filename, "w");
+
+  for(int i=0; i<n; i++){
+    fprintf(f_mue, "%g %g\n", _realSGH.getAt(i), J2meV(_mue_n1_l1.getAt(i)));
+    fprintf(f_muh, "%g %g\n", _realSGH.getAt(i), J2meV(_muh_n1_l1.getAt(i)));
+    fprintf(f_Ex, "%g %g\n", _realSGH.getAt(i), _Ex_n1_l1.getAt(i));
+  }
+
+  fclose(f_mue);
+  fclose(f_muh);
+  fclose(f_Ex);
 }

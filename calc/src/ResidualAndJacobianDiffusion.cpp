@@ -50,6 +50,7 @@ void ResidualAndJacobianDiffusion::
 residual(const NumericVector<Number> &U, NumericVector<Number> &R,
 	 NonlinearImplicitSystem &sys)
 {
+  cerr << "residual" << endl;
   R.zero();
 
 
@@ -69,7 +70,7 @@ residual(const NumericVector<Number> &U, NumericVector<Number> &R,
   DenseMatrix<Number> Ke;
   DenseVector<Number> Fe, Ue, Re;
 
-  DenseSubMatrix<Number> Kee(Ke), Khh(Ke);
+  DenseSubMatrix<Number> Kee(Ke), Khh(Ke), Keh(Ke), Khe(Ke);
   DenseSubVector<Number> Fee(Fe), Fhh(Fe);
 
 
@@ -95,6 +96,8 @@ residual(const NumericVector<Number> &U, NumericVector<Number> &R,
     Ke.resize(nDofs, nDofs);
     Ke.zero();
     Kee.reposition(id_e*nDofs_e, id_e*nDofs_e, nDofs_e, nDofs_e);
+    Keh.reposition(id_e*nDofs_e, id_h*nDofs_h, nDofs_e, nDofs_h);
+    Khe.reposition(id_h*nDofs_h, id_e*nDofs_e, nDofs_h, nDofs_e);
     Khh.reposition(id_h*nDofs_h, id_h*nDofs_h, nDofs_h, nDofs_h);
 
     _addK(Kee, *el, iElem, -1);
@@ -126,20 +129,25 @@ residual(const NumericVector<Number> &U, NumericVector<Number> &R,
     _addF(Fee, *el, iElem, -1);
     _addF(Fhh, *el, iElem, +1);
 
+
+    // Re = Ke*Ue-Fe.
+
     for(int i=0; i<nDofs; i++) Re(i) -= Fe(i);
 
 
-    // Re = Ke*Ue-Fe.
+    // Constrain the element vector and add it to the entire vector.
 
     _dofMapRef->constrain_element_vector(Re, dofInd);
     R.add_vector(Re, dofInd);
   }
+
 }
 
 void ResidualAndJacobianDiffusion::
 jacobian(const NumericVector<Number> &U, SparseMatrix<Number> &J, 
 	 NonlinearImplicitSystem &sys)
 {
+  cerr << "jacobian" << endl;
   J.zero();
 
 
@@ -200,6 +208,9 @@ jacobian(const NumericVector<Number> &U, SparseMatrix<Number> &J,
 
     _add_dKdU_U(Jee, *el, iElem, U, dofInd_e, -1);
     _add_dKdU_U(Jhh, *el, iElem, U, dofInd_h, +1);
+
+
+    // Constrain the element matrix and add it to the entire matrix.
 
     _dofMapRef->constrain_element_matrix(Je, dofInd);
     J.add_matrix(Je, dofInd);
