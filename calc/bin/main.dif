@@ -8,11 +8,11 @@ Simulation {
   Lc 3000
   T 300
   alpha 10
-  tMax 10000
+  tMax 1
 }
 
 Output {
-  tOutputStep 100
+  tOutputStep 0.1
   tOutputBinStep 100000
   toOutputSS true
   toOutputFermiLevel true

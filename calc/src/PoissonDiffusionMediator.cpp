@@ -26,6 +26,7 @@ PoissonDiffusionMediator(const RealSpaceGridHandler &realSGH,
   _Ex_n(realSGH), _Ex_n1_l(realSGH), _Ex_n1_l1(realSGH),
   _dEx_dx_n(realSGH), _dEx_dx_n1_l(realSGH), _dEx_dx_n1_l1(realSGH),
   _SigmaDope(realSGH), _poisson(poisson),
+  _nrStepsNI(0),
   _realSGH(realSGH), _fermiDistr(fermiDistr)
 {
   for(int i=0; i<_SigmaDope.getSize(); i++){
@@ -225,4 +226,6 @@ updateSolutionsNI(const RealSpaceArrayDiffusion &mue,
 
   _poisson.solveAndCalcField2DEG(_t, _Ex_n1_l1, _dEx_dx_n1_l1, rho2D);
 
+
+  
 }

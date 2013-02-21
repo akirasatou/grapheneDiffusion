@@ -137,23 +137,23 @@ void GrapheneTransportSolver1D::solveStep()
   
   if(_nSteps%n_output_step == 0){
     if( _difDsc.toOutputFermiLevel() ){
-      sprintf(filehead, "mu-t=%04.0ffs", s2fs(t));
+      sprintf(filehead, "mu-t=%05.1ffs", s2fs(t));
       outputFermiLevel2DEG(_muDir.c_str(), filehead);
     }
     if( _difDsc.toOutputConcentration() ){
-      sprintf(filehead, "conc-t=%04.0ffs", s2fs(t));
+      sprintf(filehead, "conc-t=%05.1ffs", s2fs(t));
       outputConcentration2DEG(_concDir.c_str(), filehead);
     }
     if( _difDsc.toOutputPotential2D() ){
-      sprintf(filehead, "phi-t=%04.0ffs", s2fs(t));
+      sprintf(filehead, "phi-t=%05.1ffs", s2fs(t));
       outputPotential(_pot2DDir.c_str(), filehead);
     }
     if( _difDsc.toOutputField() ){
-      sprintf(filehead, "field-t=%04.0ffs", s2fs(t));
+      sprintf(filehead, "field-t=%05.1ffs", s2fs(t));
       outputField2DEG(_fieldDir.c_str(), filehead);
     }
     if( _difDsc.toOutputVelocity() ){
-      sprintf(filehead, "vel-t=%04.0ffs", s2fs(t));
+      sprintf(filehead, "vel-t=%05.1ffs", s2fs(t));
       outputVelocity(_velDir.c_str(), filehead);
     }
   }

@@ -52,6 +52,7 @@ residual(const NumericVector<Number> &U, NumericVector<Number> &R,
 {
   R.zero();
 
+
   // Numeric ids.
 
   const unsigned int id_e = sys.variable_number("mu_e");
@@ -69,7 +70,7 @@ residual(const NumericVector<Number> &U, NumericVector<Number> &R,
   DenseVector<Number> Fe, Ue, Re;
 
   DenseSubMatrix<Number> Kee(Ke), Khh(Ke);
-  DenseSubVector<Number> Fee(Fe), Fhh(Fhh);
+  DenseSubVector<Number> Fee(Fe), Fhh(Fe);
 
 
   // Loop for each element.
@@ -139,6 +140,8 @@ void ResidualAndJacobianDiffusion::
 jacobian(const NumericVector<Number> &U, SparseMatrix<Number> &J, 
 	 NonlinearImplicitSystem &sys)
 {
+  J.zero();
+
 
   // Update the current solution in nonlinear iteration using the
   // current solution vector $U$ obtained in FEM. 
@@ -197,6 +200,9 @@ jacobian(const NumericVector<Number> &U, SparseMatrix<Number> &J,
 
     _add_dKdU_U(Jee, *el, iElem, U, dofInd_e, -1);
     _add_dKdU_U(Jhh, *el, iElem, U, dofInd_h, +1);
+
+    _dofMapRef->constrain_element_matrix(Je, dofInd);
+    J.add_matrix(Je, dofInd);
   }
 }
 
@@ -309,12 +315,8 @@ _addK(DenseSubMatrix<Number> &K, const Elem *elem, int iElem,
     
   AutoPtr<FEBase> fe(FEBase::build(dim, feType));
   QGauss qrule(dim, FIFTH);
-  fe->attach_quadrature_rule(&qrule);
-    
-  AutoPtr<FEBase> feFace(FEBase::build(dim, feType));
-  QGauss qface(dim-1, FIFTH);
-  feFace->attach_quadrature_rule(&qface);
 
+  fe->attach_quadrature_rule(&qrule);
   fe->reinit(elem);
 
   const vector<Real> &JxW = fe->get_JxW();
@@ -325,7 +327,6 @@ _addK(DenseSubMatrix<Number> &K, const Elem *elem, int iElem,
 
   for(unsigned int qp=0; qp<qrule.n_points(); qp++){
     int ir = _realSGH.getPointInvID(iElem, qp);
-    double C = 0.0;
     double mu_n1_l1, dmu_dx_n1_l1;
     double Ex_n1_l1 = _pdm.get_Ex_n1_l1(ir);
 
@@ -439,12 +440,8 @@ _addF(DenseSubVector<Number> &F, const Elem *elem, int iElem,
     
   AutoPtr<FEBase> fe(FEBase::build(dim, feType));
   QGauss qrule(dim, FIFTH);
-  fe->attach_quadrature_rule(&qrule);
-    
-  AutoPtr<FEBase> feFace(FEBase::build(dim, feType));
-  QGauss qface(dim-1, FIFTH);
-  feFace->attach_quadrature_rule(&qface);
 
+  fe->attach_quadrature_rule(&qrule);
   fe->reinit(elem);
 
   const vector<Real> &JxW = fe->get_JxW();
@@ -453,6 +450,7 @@ _addF(DenseSubVector<Number> &F, const Elem *elem, int iElem,
 
   for(unsigned int qp=0; qp<qrule.n_points(); qp++){
     int ir = _realSGH.getPointInvID(iElem, qp);
+
     double C = 0.0;
     double mu_n, dmu_dx_n, d2mu_dx2_n, mu_n1_l1;
     double Ex_n = _pdm.get_Ex_n(ir), dEx_dx_n = _pdm.get_dEx_dx_n(ir);

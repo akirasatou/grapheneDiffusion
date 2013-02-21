@@ -72,6 +72,7 @@ private:
   RealSpaceArrayDiffusion _SigmaDope;
   PoissonSolver2D &_poisson;
   double _t, _dt;
+  int _nrStepsNI;
   const RealSpaceGridHandler &_realSGH;
 
   const FermiDistrGraphene _fermiDistr;
