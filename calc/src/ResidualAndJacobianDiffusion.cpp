@@ -1,4 +1,5 @@
 #include <PhysicalConstants.h>
+#include <PhysicalUnits.h>
 #include "ResidualAndJacobianDiffusion.h"
 #include "fe.h"
 #include "elem.h"
@@ -173,7 +174,7 @@ jacobian(const NumericVector<Number> &U, SparseMatrix<Number> &J,
   //         |K_{he}^{e} K_{hh}^{e}| where K_{eh}^{e}=K_{he}^{e}=0.
 
   DenseMatrix<Number> Je;
-  DenseSubMatrix<Number> Jee(Je), Jhh(Je); // Jeh(Je), Jhe(Je),
+  DenseSubMatrix<Number> Jee(Je), Jhh(Je), Jeh(Je), Jhe(Je);
 
 
   // Loop for each element.
@@ -198,6 +199,8 @@ jacobian(const NumericVector<Number> &U, SparseMatrix<Number> &J,
     Je.resize(nDofs, nDofs);
     Je.zero();
     Jee.reposition(id_e*nDofs_e, id_e*nDofs_e, nDofs_e, nDofs_e);
+    Jeh.reposition(id_e*nDofs_e, id_h*nDofs_h, nDofs_e, nDofs_h);
+    Jhe.reposition(id_h*nDofs_h, id_e*nDofs_e, nDofs_h, nDofs_e);
     Jhh.reposition(id_h*nDofs_h, id_h*nDofs_h, nDofs_h, nDofs_h);
 
     _addK(Jee, *el, iElem, -1);
@@ -206,8 +209,8 @@ jacobian(const NumericVector<Number> &U, SparseMatrix<Number> &J,
 
     // Je = Ke+dKe/dUe*Ue.
 
-    _add_dKdU_U(Jee, *el, iElem, U, dofInd_e, -1);
-    _add_dKdU_U(Jhh, *el, iElem, U, dofInd_h, +1);
+    //_add_dKdU_U(Jee, *el, iElem, U, dofInd_e, -1);
+    //_add_dKdU_U(Jhh, *el, iElem, U, dofInd_h, +1);
 
 
     // Constrain the element matrix and add it to the entire matrix.
@@ -339,7 +342,7 @@ _addK(DenseSubMatrix<Number> &K, const Elem *elem, int iElem,
   for(unsigned int qp=0; qp<qrule.n_points(); qp++){
     int ir = _realSGH.getPointInvID(iElem, qp);
     double mu_n1_l1, dmu_dx_n1_l1;
-    double Ex_n1_l1 = _pdm.get_Ex_n1_l1(ir);
+    double Ex_n1_l1 = 0.0;//_pdm.get_Ex_n1_l1(ir);
 
     if( s == -1 ){
       mu_n1_l1 = _pdm.get_mue_n1_l1(ir);
@@ -401,7 +404,7 @@ _add_dKdU_U(DenseSubMatrix<Number> &K, const Elem *elem,
   for(unsigned int qp=0; qp<qrule.n_points(); qp++){
     int ir = _realSGH.getPointInvID(iElem, qp);
     double mu_n1_l1, dmu_dx_n1_l1;
-    double Ex_n1_l1 = _pdm.get_Ex_n1_l1(ir);
+    double Ex_n1_l1 = 0.0;//_pdm.get_Ex_n1_l1(ir);
 
     if( s == -1 ){
       mu_n1_l1 = _pdm.get_mue_n1_l1(ir);
@@ -464,8 +467,9 @@ _addF(DenseSubVector<Number> &F, const Elem *elem, int iElem,
 
     double C = 0.0;
     double mu_n, dmu_dx_n, d2mu_dx2_n, mu_n1_l1;
-    double Ex_n = _pdm.get_Ex_n(ir), dEx_dx_n = _pdm.get_dEx_dx_n(ir);
-    double dEx_dx_n1_l1 = _pdm.get_dEx_dx_n1_l1(ir);
+    double Ex_n = 0.0;//_pdm.get_Ex_n(ir);
+    double dEx_dx_n = 0.0;//_pdm.get_dEx_dx_n(ir);
+    double dEx_dx_n1_l1 = 0.0;//_pdm.get_dEx_dx_n1_l1(ir);
 
     if( s == -1 ){
       mu_n = _pdm.get_mue_n(ir);

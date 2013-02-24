@@ -1,6 +1,6 @@
 Mesh {
-  Nx 800
-  dt 0.1
+  Nx 90
+  dt 1
 }
 
 Simulation {
@@ -12,7 +12,7 @@ Simulation {
 }
 
 Output {
-  tOutputStep 0.1
+  tOutputStep 1
   tOutputBinStep 100000
   toOutputSS true
   toOutputFermiLevel true

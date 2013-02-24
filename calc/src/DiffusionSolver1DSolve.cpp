@@ -1,6 +1,8 @@
 #include "DiffusionSolver1D.h"
+#include <quadrature_gauss.h>
 #include <nonlinear_implicit_system.h>
 #include <transient_system.h>
+#include <PhysicalUnits.h>
 
 using namespace std;
 
@@ -23,7 +25,12 @@ void DiffusionSolver1D::solveStep(double t, double dt)
 
   // Save the solution of the previous time step.
 
-  *sys.old_local_solution = *sys.current_local_solution;
+  if( _nSteps == 0 ){
+
+  }
+  else {
+    *sys.old_local_solution = *sys.current_local_solution;
+  }
 
 
   // Set the solutions of the previous time step as the start of
