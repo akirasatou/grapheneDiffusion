@@ -35,6 +35,8 @@ public:
 		SparseMatrix<Number> &J, 
 		NonlinearImplicitSystem &sys);
   void setTime(double t, double dt);
+  void setNextSolutionsNI(const NumericVector<Number> &U,
+			  NonlinearImplicitSystem &sys);
 
   virtual ~ResidualAndJacobianDiffusion();
 
@@ -52,8 +54,6 @@ private:
   double _t, _dt;
   double _Xl, _Xr;
 
-  void _setNextSolutionsNI(const NumericVector<Number> &U,
-			   NonlinearImplicitSystem &sys);
 
   void _addK(DenseSubMatrix<Number> &K, const Elem *elem, int iElem,
 	     int s) const;

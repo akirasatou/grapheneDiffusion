@@ -178,7 +178,7 @@ jacobian(const NumericVector<Number> &U, SparseMatrix<Number> &J,
   // jacobian() is called first in the nonlinear iteration in libMesh.
   // Besides, residual() is called twice in one iteration.
 
-  _setNextSolutionsNI(U, sys);
+  setNextSolutionsNI(U, sys);
 
 
   // Numeric ids.
@@ -260,8 +260,8 @@ void ResidualAndJacobianDiffusion::setTime(double t, double dt)
  */
 
 void ResidualAndJacobianDiffusion::
-_setNextSolutionsNI(const NumericVector<Number> &U,
-		    NonlinearImplicitSystem &sys)
+setNextSolutionsNI(const NumericVector<Number> &U,
+		   NonlinearImplicitSystem &sys)
 {
 
   // Calculate $\mu_{r,n+1}^{(l+1)}$ from $U$.

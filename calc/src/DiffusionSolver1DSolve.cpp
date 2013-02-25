@@ -41,6 +41,7 @@ void DiffusionSolver1D::solveStep(double t, double dt)
 
   // Update the solutions to the next time step.
 
+  _rj->setNextSolutionsNI(*sys.current_local_solution, sys);
   _pdm.updateSolutions();
   _nSteps++;
 
