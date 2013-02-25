@@ -234,7 +234,7 @@ updateSolutionsNI(const RealSpaceArrayDiffusion &mue,
     _dmue_dx_n1_l1.setAt(i, dmue_dx.getAt(i));
     _d2mue_dx2_n1_l1.setAt(i, d2mue_dx2.getAt(i));
 
-    _muh_n1_l1.setAt(i, mue.getAt(i));
+    _muh_n1_l1.setAt(i, muh.getAt(i));
     _dmuh_dx_n1_l1.setAt(i, dmuh_dx.getAt(i));
     _d2muh_dx2_n1_l1.setAt(i, d2muh_dx2.getAt(i));
   }

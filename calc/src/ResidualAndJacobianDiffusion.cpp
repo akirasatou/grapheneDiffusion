@@ -105,25 +105,18 @@ residual(const NumericVector<Number> &U, NumericVector<Number> &R,
 
     _addK(Kee, *el, iElem, -1);
     _addK(Khh, *el, iElem, +1);
-
     /*
-    cerr << "iElem=" << iElem << ", Kee" << endl;
-    for(int i=0; i<Kee.m(); i++){
-      for(int j=0; j<Kee.n(); j++){
-	cerr << Kee(i, j) << " ";
+    cerr << iElem << endl;
+    cerr << "Ke" << endl;
+    for(int i=0; i<Ke.m(); i++){
+      for(int j=0; j<Ke.n(); j++){
+	cerr << Ke(i, j) << " ";
       }
       cerr << endl;
     }
-    cerr << "iElem=" << iElem << ", Khh" << endl;
-    for(int i=0; i<Khh.m(); i++){
-      for(int j=0; j<Khh.n(); j++){
-	cerr << Khh(i, j) << " ";
-      }
-      cerr << endl;
-    }
-
     cerr << endl;
     */
+
 
     // Setup Ue.
 
@@ -145,10 +138,18 @@ residual(const NumericVector<Number> &U, NumericVector<Number> &R,
     Fe.resize(nDofs);
     Fe.zero();
     Fee.reposition(id_e*nDofs_e, nDofs_e);
-    Fhh.reposition(id_e*nDofs_h, nDofs_h);
+    Fhh.reposition(id_h*nDofs_h, nDofs_h);
 
     _addF(Fee, *el, iElem, -1);
     _addF(Fhh, *el, iElem, +1);
+
+    /*
+    cerr << "Fe" << endl;
+    for(int i=0; i<Fe.size(); i++){
+      cerr << Fe(i) << endl;
+    }
+    cerr << endl;
+    */
 
 
     // Re = Ke*Ue-Fe.
@@ -229,8 +230,8 @@ jacobian(const NumericVector<Number> &U, SparseMatrix<Number> &J,
 
     // Je = Ke+dKe/dUe*Ue.
 
-    //_add_dKdU_U(Jee, *el, iElem, U, dofInd_e, -1);
-    //_add_dKdU_U(Jhh, *el, iElem, U, dofInd_h, +1);
+    _add_dKdU_U(Jee, *el, iElem, U, dofInd_e, -1);
+    _add_dKdU_U(Jhh, *el, iElem, U, dofInd_h, +1);
 
 
     // Constrain the element matrix and add it to the entire matrix.

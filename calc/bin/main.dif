@@ -1,13 +1,13 @@
 Mesh {
   Nx 90
-  dt 1
+  dt 20
 }
 
 Simulation {
   Sigma0 0.0
   Lc 3000
   T 300
-  alpha 10
+  alpha 20
   tMax 1
 }
 

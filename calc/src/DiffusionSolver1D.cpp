@@ -88,7 +88,8 @@ DiffusionSolver1D(const DiffusionSolver1DDescriptor &difDsc,
   // Setup some parameters in EquationSystems.
 
   _es.parameters.set<Real>("dt") = _difDsc.get_dt();
-  _es.parameters.set<Real>("nonlinear solver relative step tolerance") = 1e-5;
+  //_es.parameters.set<Real>("nonlinear solver relative step tolerance") = 1e-5;
+_es.parameters.set<Real>("nonlinear solver relative residual tolerance") = 1e-30;
   _es.parameters.set<unsigned int>("nonlinear solver maximum iterations") = 100;
 
 

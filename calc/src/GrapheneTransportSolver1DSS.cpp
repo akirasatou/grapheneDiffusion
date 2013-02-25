@@ -60,7 +60,7 @@ void GrapheneTransportSolver1D::_setInitialSteadyStateSCF()
     _SigmaElectron.setAt(i, se.getAt(i));
     _SigmaHole.setAt(i, sh.getAt(i));
     _muElectron.setAt(i, E);
-    _muHole.setAt(i, E);
+    _muHole.setAt(i, -E);
   }
 
 
