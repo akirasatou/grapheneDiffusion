@@ -25,12 +25,7 @@ void DiffusionSolver1D::solveStep(double t, double dt)
 
   // Save the solution of the previous time step.
 
-  if( _nSteps == 0 ){
-
-  }
-  else {
-    *sys.old_local_solution = *sys.current_local_solution;
-  }
+  *sys.old_local_solution = *sys.current_local_solution;
 
 
   // Set the solutions of the previous time step as the start of

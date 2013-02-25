@@ -106,6 +106,24 @@ residual(const NumericVector<Number> &U, NumericVector<Number> &R,
     _addK(Kee, *el, iElem, -1);
     _addK(Khh, *el, iElem, +1);
 
+    /*
+    cerr << "iElem=" << iElem << ", Kee" << endl;
+    for(int i=0; i<Kee.m(); i++){
+      for(int j=0; j<Kee.n(); j++){
+	cerr << Kee(i, j) << " ";
+      }
+      cerr << endl;
+    }
+    cerr << "iElem=" << iElem << ", Khh" << endl;
+    for(int i=0; i<Khh.m(); i++){
+      for(int j=0; j<Khh.n(); j++){
+	cerr << Khh(i, j) << " ";
+      }
+      cerr << endl;
+    }
+
+    cerr << endl;
+    */
 
     // Setup Ue.
 
