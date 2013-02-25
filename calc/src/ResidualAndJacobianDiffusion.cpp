@@ -24,11 +24,13 @@ ResidualAndJacobianDiffusion(const DiffusionABCalculator &ab,
 			     PoissonDiffusionMediator &pdm,
 			     const MeshBase &meshBase,
 			     const DofMap &dofMap,
-			     const RealSpaceGridHandler &realSGH):
+			     const RealSpaceGridHandler &realSGH,
+			     double Xl, double Xr):
   _ab(ab), _pdm(pdm), _meshBaseRef(&meshBase), _dofMapRef(&dofMap),
   _mue(realSGH), _dmue_dx(realSGH), _d2mue_dx2(realSGH),
   _muh(realSGH), _dmuh_dx(realSGH), _d2muh_dx2(realSGH),
-  _Ex(realSGH), _dEx_dx(realSGH), _realSGH(realSGH)
+  _Ex(realSGH), _dEx_dx(realSGH), _realSGH(realSGH),
+  _Xl(Xl), _Xr(Xr)
 {
 }
 
@@ -276,7 +278,7 @@ _setNextSolutionsNI(const NumericVector<Number> &U,
     vector<double> tmp = _realSGH.getPointsInElem(iElem);
     vector<Point> qps(tmp.size()), v;
 
-    for(int i=0; i<qps.size(); i++) qps[i] = Point(tmp[i]);
+    for(int i=0; i<qps.size(); i++) qps[i] = Point(tmp[i]/micro2m(1));
 
     FE<1, LAGRANGE>::inverse_map(*el, qps, v);
     fe->reinit(*el, &v);
@@ -289,9 +291,9 @@ _setNextSolutionsNI(const NumericVector<Number> &U,
       _d2mue_dx2.setAt(i, 0.0);
 
       for(unsigned int k=0; k<dofInd_e.size(); k++){
-	_mue.addAt(i, phi[k][j]*U(dofInd_e[k]));
-	_dmue_dx.addAt(i, dphidx[k][j]*U(dofInd_e[k]));
-	_d2mue_dx2.addAt(i, d2phidx2[k][j]*U(dofInd_e[k]));
+	_mue.addAt(i, meV2J(1)*phi[k][j]*U(dofInd_e[k]));
+	_dmue_dx.addAt(i, meV2J(1)*dphidx[k][j]*U(dofInd_e[k]));
+	_d2mue_dx2.addAt(i, meV2J(1)*d2phidx2[k][j]*U(dofInd_e[k]));
       }
 
       _muh.setAt(i, 0.0);
@@ -299,9 +301,9 @@ _setNextSolutionsNI(const NumericVector<Number> &U,
       _d2muh_dx2.setAt(i, 0.0);
 
       for(unsigned int k=0; k<dofInd_h.size(); k++){
-	_muh.addAt(i, phi[k][j]*U(dofInd_h[k]));
-	_dmuh_dx.addAt(i, dphidx[k][j]*U(dofInd_h[k]));
-	_d2muh_dx2.addAt(i, d2phidx2[k][j]*U(dofInd_h[k]));
+	_muh.addAt(i, meV2J(1)*phi[k][j]*U(dofInd_h[k]));
+	_dmuh_dx.addAt(i, meV2J(1)*dphidx[k][j]*U(dofInd_h[k]));
+	_d2muh_dx2.addAt(i, meV2J(1)*d2phidx2[k][j]*U(dofInd_h[k]));
       }
     }
 

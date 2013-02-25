@@ -14,6 +14,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <PhysicalUnits.h>
 
 using namespace std;
 
@@ -45,7 +46,7 @@ DiffusionSolver1D(const DiffusionSolver1DDescriptor &difDsc,
   // Generate a uniform mesh. Each element has 3 interior points.
 
   MeshTools::Generation::build_line(_mesh, _difDsc.getNx()/3,
-				    _Xl, _Xr, EDGE3);
+				    _Xl/micro2m(1), _Xr/micro2m(1), EDGE3);
   
   
   // Set up the equation system.
@@ -95,7 +96,7 @@ DiffusionSolver1D(const DiffusionSolver1DDescriptor &difDsc,
 
   _rj = new ResidualAndJacobianDiffusion(_ab, _pdm, _es.get_mesh(),
 					 sys.get_dof_map(),
-					 getRealSGH());
+					 getRealSGH(), _Xl, _Xr);
   sys.nonlinear_solver->residual_object = _rj;
   sys.nonlinear_solver->jacobian_object = _rj;
 
@@ -152,10 +153,10 @@ void DiffusionSolver1D::_setBoundaryID()
       for(unsigned int qp=0; qp<qface.n_points(); qp++){
 	Real xf = rf[qp](0);
 
-	if( isEqual(xf, _Xl) ){
+	if( isEqual(xf, _Xl/micro2m(1)) ){
 	  boundaryID = BoundaryIDLeft;
 	}
-	else if( isEqual(xf, _Xr) ){
+	else if( isEqual(xf, _Xr/micro2m(1)) ){
 	  boundaryID = BoundaryIDRight;
 	}
       }
@@ -198,7 +199,7 @@ RealSpaceGridHandler DiffusionSolver1D::getRealSGH() const
     x[iElem].resize(qrule.n_points());
 
     for(unsigned int qp=0; qp<qrule.n_points(); qp++){
-      x[iElem][qp] = r[qp](0);
+      x[iElem][qp] = micro2m(1)*r[qp](0);
     }
   }
 
