@@ -72,7 +72,7 @@ DiffusionSolver1D(const DiffusionSolver1DDescriptor &difDsc,
   _setBoundaryID();
 
   DofMap &dofMap = sys.get_dof_map();
-  PeriodicBoundary pbc(RealVectorValue(_difDsc.getLc()));
+  PeriodicBoundary pbc(RealVectorValue(_difDsc.getLc()/micro2m(1), 0.0, 0.0));
 
   pbc.myboundary = BoundaryIDLeft;
   pbc.pairedboundary = BoundaryIDRight;

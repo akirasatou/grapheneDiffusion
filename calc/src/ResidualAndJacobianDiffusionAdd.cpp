@@ -174,7 +174,7 @@ _addF(DenseSubVector<Number> &F, const Elem *elem, int iElem,
     }
 
     C += mu_n-0.5*s*(_dt/fs2s(1))*_ab.calcA((meV2J(1))*mu_n)/(micro2m(1)*micro2m(1)/(meV2J(1)*fs2s(1)))*(e*Ex_n/(meV2J(1)/micro2m(1))-s*dmu_dx_n)*dmu_dx_n;
-    C += 0.5*(_dt/fs2s(1))*_ab.calcB((meV2J(1))*mu_n)/(micro2m(1)*micro2m(1)/(fs2s(1)))*(d2mu_dx2_n-s*e*Ex_n/(meV2J(1)/micro2m(1)));
+    C += 0.5*(_dt/fs2s(1))*_ab.calcB((meV2J(1))*mu_n)/(micro2m(1)*micro2m(1)/(fs2s(1)))*(d2mu_dx2_n-s*e*dEx_dx_n/(meV2J(1)/micro2m(1)));
     C += -0.5*s*(_dt/fs2s(1))*_ab.calcB((meV2J(1))*mu_n1_l1)/(micro2m(1)*micro2m(1)/(fs2s(1)))*e*dEx_dx_n1_l1/(meV2J(1)/micro2m(1));
 
     for(unsigned int i=0; i<phi.size(); i++){

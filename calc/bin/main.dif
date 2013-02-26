@@ -1,5 +1,5 @@
 Mesh {
-  Nx 90
+  Nx 300
   dt 20
 }
 
@@ -8,12 +8,13 @@ Simulation {
   Lc 3000
   T 300
   alpha 20
-  tMax 1
+  tMax 1000
 }
 
 Output {
-  tOutputStep 1
+  tOutputStep 20
   tOutputBinStep 100000
   toOutputSS true
+  toOutputConcentration true
   toOutputFermiLevel true
 }

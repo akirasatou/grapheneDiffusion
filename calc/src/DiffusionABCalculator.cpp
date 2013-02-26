@@ -54,5 +54,5 @@ double DiffusionABCalculator::calc_dB_dmu(double mu) const
   double expx = exp(x), expmx = 1/expx;
   double oolog = 1.0/log(1+expx);
 
-  return -c*oolog/((1+expmx)*(1+expmx))*(-oolog+expmx);
+  return c*oolog/((1+expmx)*(1+expmx))*(-oolog+expmx);
 }

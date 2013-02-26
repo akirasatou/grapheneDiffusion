@@ -120,6 +120,14 @@ void GrapheneTransportSolver1D::solveStep()
   _pdm.getCurrentSolutions(_muElectron, _muHole, _Ex);
 
 
+  // Calculate the concentration from the Fermi levels.
+
+  for(int i=0; i<_realSGH.getSize(); i++){
+    _SigmaElectron.setAt(i, _fermiDistr.calcConcentrationFermiExact(_muElectron.getAt(i)));
+    _SigmaHole.setAt(i, _fermiDistr.calcConcentrationFermiExact(_muHole.getAt(i)));
+  }
+
+
   // Output.
 
   int n_output_step = (int)round(_difDsc.get_tOutputStep()/_difDsc.get_dt());

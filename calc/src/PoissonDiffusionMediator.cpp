@@ -257,15 +257,15 @@ updateSolutionsNI(const RealSpaceArrayDiffusion &mue,
 
   _poisson.solveAndCalcField2DEG(_t, _Ex_n1_l1, _dEx_dx_n1_l1, rho2D);
 
-
+  /*
   FILE *f_mue, *f_muh, *f_Ex;
   char filename[100];
 
-  sprintf(filename, "dat/mue-t=%05.1ffs-NI=%d.dat", s2fs(_t), _nrStepsNI);
+  sprintf(filename, "dat/mue-t=%05.1ffs-NI=%02d.dat", s2fs(_t), _nrStepsNI);
   f_mue = fopen(filename, "w");
-  sprintf(filename, "dat/muh-t=%05.1ffs-NI=%d.dat", s2fs(_t), _nrStepsNI);
+  sprintf(filename, "dat/muh-t=%05.1ffs-NI=%02d.dat", s2fs(_t), _nrStepsNI);
   f_muh = fopen(filename, "w");
-  sprintf(filename, "dat/Ex-t=%05.1ffs-NI=%d.dat", s2fs(_t), _nrStepsNI);
+  sprintf(filename, "dat/Ex-t=%05.1ffs-NI=%02d.dat", s2fs(_t), _nrStepsNI);
   f_Ex = fopen(filename, "w");
 
   for(int i=0; i<n; i++){
@@ -277,8 +277,6 @@ updateSolutionsNI(const RealSpaceArrayDiffusion &mue,
   fclose(f_mue);
   fclose(f_muh);
   fclose(f_Ex);
-
+  */
   _nrStepsNI++;
-
-  if( _nrStepsNI == 10 ) exit(1);
 }

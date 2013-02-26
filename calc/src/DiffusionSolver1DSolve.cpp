@@ -44,6 +44,4 @@ void DiffusionSolver1D::solveStep(double t, double dt)
   _rj->setNextSolutionsNI(*sys.current_local_solution, sys);
   _pdm.updateSolutions();
   _nSteps++;
-
-  exit(1);
 }
