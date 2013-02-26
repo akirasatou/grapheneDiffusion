@@ -26,8 +26,7 @@ public:
 			       PoissonDiffusionMediator &pdm,
 			       const MeshBase &meshBase,
 			       const DofMap &dofMap,
-			       const RealSpaceGridHandler &realSGH,
-			       double Xl, double Xr);
+			       const RealSpaceGridHandler &realSGH);
   void residual(const NumericVector<Number> &U,
                 NumericVector<Number> &R,
 		NonlinearImplicitSystem &sys);
@@ -52,7 +51,6 @@ private:
   RealSpaceArrayDiffusion _Ex, _dEx_dx;
   RealSpaceGridHandler _realSGH;
   double _t, _dt;
-  double _Xl, _Xr;
 
 
   void _addK(DenseSubMatrix<Number> &K, const Elem *elem, int iElem,

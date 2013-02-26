@@ -24,13 +24,11 @@ ResidualAndJacobianDiffusion(const DiffusionABCalculator &ab,
 			     PoissonDiffusionMediator &pdm,
 			     const MeshBase &meshBase,
 			     const DofMap &dofMap,
-			     const RealSpaceGridHandler &realSGH,
-			     double Xl, double Xr):
+			     const RealSpaceGridHandler &realSGH):
   _ab(ab), _pdm(pdm), _meshBaseRef(&meshBase), _dofMapRef(&dofMap),
   _mue(realSGH), _dmue_dx(realSGH), _d2mue_dx2(realSGH),
   _muh(realSGH), _dmuh_dx(realSGH), _d2muh_dx2(realSGH),
-  _Ex(realSGH), _dEx_dx(realSGH), _realSGH(realSGH),
-  _Xl(Xl), _Xr(Xr)
+  _Ex(realSGH), _dEx_dx(realSGH), _realSGH(realSGH)
 {
 }
 

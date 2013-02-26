@@ -97,7 +97,7 @@ _es.parameters.set<Real>("nonlinear solver relative residual tolerance") = 1e-30
 
   _rj = new ResidualAndJacobianDiffusion(_ab, _pdm, _es.get_mesh(),
 					 sys.get_dof_map(),
-					 getRealSGH(), _Xl, _Xr);
+					 getRealSGH());
   sys.nonlinear_solver->residual_object = _rj;
   sys.nonlinear_solver->jacobian_object = _rj;
 
