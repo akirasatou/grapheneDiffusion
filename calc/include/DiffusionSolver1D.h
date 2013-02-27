@@ -8,7 +8,6 @@
 #include <libmesh.h>
 #include <mesh.h>
 #include <equation_systems.h>
-//#include <mesh_refinement.h>
 #include <string>
 #include <vector>
 
@@ -37,7 +36,6 @@ private:
   std::string _sysName;
   Mesh _mesh;
   EquationSystems _es;
-  //MeshRefinement _mRef;
   const DiffusionSolver1DDescriptor &_difDsc;
   const DiffusionABCalculator &_ab;
   PoissonDiffusionMediator &_pdm;

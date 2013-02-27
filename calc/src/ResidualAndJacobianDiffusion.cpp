@@ -28,7 +28,11 @@ ResidualAndJacobianDiffusion(const DiffusionABCalculator &ab,
   _ab(ab), _pdm(pdm), _meshBaseRef(&meshBase), _dofMapRef(&dofMap),
   _mue(realSGH), _dmue_dx(realSGH), _d2mue_dx2(realSGH),
   _muh(realSGH), _dmuh_dx(realSGH), _d2muh_dx2(realSGH),
-  _Ex(realSGH), _dEx_dx(realSGH), _realSGH(realSGH)
+  _Ex(realSGH), _dEx_dx(realSGH), _realSGH(realSGH),
+  _tNorm(fs2s(1)), _xNorm(micro2m(1)), _muNorm(meV2J(1)),
+  _dmudxNorm(_muNorm/_xNorm), _d2mudx2Norm(_muNorm/(_xNorm*_xNorm)),
+  _ANorm(_xNorm*_xNorm/(_muNorm*_tNorm)),
+  _BNorm(_xNorm*_xNorm/_tNorm), _eExNorm(_muNorm/_xNorm)
 {
 }
 
@@ -80,6 +84,13 @@ residual(const NumericVector<Number> &U, NumericVector<Number> &R,
   MeshBase::const_element_iterator el = _meshBaseRef->active_elements_begin();
   const MeshBase::const_element_iterator end_el = _meshBaseRef->active_elements_end();
 
+  const unsigned int dim = _meshBaseRef->mesh_dimension();
+  FEType feType = _dofMapRef->variable_type(0);
+  AutoPtr<FEBase> feFace(FEBase::build(dim, feType));
+  QGauss qface(dim-1, FIFTH);
+  feFace->attach_quadrature_rule(&qface);
+  const std::vector<Point> &rf = feFace->get_xyz();
+
   for(int iElem=0; el!=end_el; ++el, ++iElem){
     std::vector<unsigned int> dofInd, dofInd_e, dofInd_h;
 
@@ -90,7 +101,7 @@ residual(const NumericVector<Number> &U, NumericVector<Number> &R,
     const unsigned int nDofs = dofInd.size();
     const unsigned int nDofs_e = dofInd_e.size();
     const unsigned int nDofs_h = dofInd_h.size();
-    
+
 
     // Calculate the matrix Ke.
 
@@ -103,17 +114,6 @@ residual(const NumericVector<Number> &U, NumericVector<Number> &R,
 
     _addK(Kee, *el, iElem, -1);
     _addK(Khh, *el, iElem, +1);
-    /*
-    cerr << iElem << endl;
-    cerr << "Ke" << endl;
-    for(int i=0; i<Ke.m(); i++){
-      for(int j=0; j<Ke.n(); j++){
-	cerr << Ke(i, j) << " ";
-      }
-      cerr << endl;
-    }
-    cerr << endl;
-    */
 
 
     // Setup Ue.
@@ -141,14 +141,6 @@ residual(const NumericVector<Number> &U, NumericVector<Number> &R,
     _addF(Fee, *el, iElem, -1);
     _addF(Fhh, *el, iElem, +1);
 
-    /*
-    cerr << "Fe" << endl;
-    for(int i=0; i<Fe.size(); i++){
-      cerr << Fe(i) << endl;
-    }
-    cerr << endl;
-    */
-
 
     // Re = Ke*Ue-Fe.
 
@@ -160,7 +152,6 @@ residual(const NumericVector<Number> &U, NumericVector<Number> &R,
     _dofMapRef->constrain_element_vector(Re, dofInd);
     R.add_vector(Re, dofInd);
   }
-
 }
 
 void ResidualAndJacobianDiffusion::
@@ -295,7 +286,7 @@ setNextSolutionsNI(const NumericVector<Number> &U,
     vector<double> tmp = _realSGH.getPointsInElem(iElem);
     vector<Point> qps(tmp.size()), v;
 
-    for(int i=0; i<qps.size(); i++) qps[i] = Point(tmp[i]/micro2m(1));
+    for(int i=0; i<qps.size(); i++) qps[i] = Point(tmp[i]/_xNorm);
 
     FE<1, LAGRANGE>::inverse_map(*el, qps, v);
     fe->reinit(*el, &v);
@@ -308,9 +299,9 @@ setNextSolutionsNI(const NumericVector<Number> &U,
       _d2mue_dx2.setAt(i, 0.0);
 
       for(unsigned int k=0; k<dofInd_e.size(); k++){
-	_mue.addAt(i, meV2J(1)*phi[k][j]*U(dofInd_e[k]));
-	_dmue_dx.addAt(i, meV2J(1)*dphidx[k][j]*U(dofInd_e[k]));
-	_d2mue_dx2.addAt(i, meV2J(1)*d2phidx2[k][j]*U(dofInd_e[k]));
+	_mue.addAt(i, _muNorm*phi[k][j]*U(dofInd_e[k]));
+	_dmue_dx.addAt(i, _muNorm*dphidx[k][j]*U(dofInd_e[k]));
+	_d2mue_dx2.addAt(i, _muNorm*d2phidx2[k][j]*U(dofInd_e[k]));
       }
 
       _muh.setAt(i, 0.0);
@@ -318,9 +309,9 @@ setNextSolutionsNI(const NumericVector<Number> &U,
       _d2muh_dx2.setAt(i, 0.0);
 
       for(unsigned int k=0; k<dofInd_h.size(); k++){
-	_muh.addAt(i, meV2J(1)*phi[k][j]*U(dofInd_h[k]));
-	_dmuh_dx.addAt(i, meV2J(1)*dphidx[k][j]*U(dofInd_h[k]));
-	_d2muh_dx2.addAt(i, meV2J(1)*d2phidx2[k][j]*U(dofInd_h[k]));
+	_muh.addAt(i, _muNorm*phi[k][j]*U(dofInd_h[k]));
+	_dmuh_dx.addAt(i, _muNorm*dphidx[k][j]*U(dofInd_h[k]));
+	_d2muh_dx2.addAt(i, _muNorm*d2phidx2[k][j]*U(dofInd_h[k]));
       }
     }
 

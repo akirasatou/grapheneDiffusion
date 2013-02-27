@@ -40,27 +40,27 @@ _addK(DenseSubMatrix<Number> &K, const Elem *elem, int iElem,
   for(unsigned int qp=0; qp<qrule.n_points(); qp++){
     int ir = _realSGH.getPointInvID(iElem, qp);
     double mu_n1_l1, dmu_dx_n1_l1;
-    double Ex_n1_l1 = 0.0;//_pdm.get_Ex_n1_l1(ir);
+    double eEx_n1_l1 = 0.0;//e*_pdm.get_Ex_n1_l1(ir)/_eExNorm;
 
     if( s == -1 ){
-      mu_n1_l1 = _pdm.get_mue_n1_l1(ir)/(meV2J(1));
-      dmu_dx_n1_l1 = _pdm.get_dmue_dx_n1_l1(ir)/(meV2J(1)/micro2m(1));
+      mu_n1_l1 = _pdm.get_mue_n1_l1(ir)/_muNorm;
+      dmu_dx_n1_l1 = _pdm.get_dmue_dx_n1_l1(ir)/_dmudxNorm;
     }
     else {
-      mu_n1_l1 = _pdm.get_muh_n1_l1(ir)/(meV2J(1));
-      dmu_dx_n1_l1 = _pdm.get_dmuh_dx_n1_l1(ir)/(meV2J(1)/micro2m(1));
+      mu_n1_l1 = _pdm.get_muh_n1_l1(ir)/_muNorm;
+      dmu_dx_n1_l1 = _pdm.get_dmuh_dx_n1_l1(ir)/_dmudxNorm;
     }
 
-    double A = _ab.calcA((meV2J(1))*mu_n1_l1)/(micro2m(1)*micro2m(1)/(meV2J(1)*fs2s(1)));
-    double B = _ab.calcB((meV2J(1))*mu_n1_l1)/(micro2m(1)*micro2m(1)/(fs2s(1)));
+    double A = _ab.calcA(_muNorm*mu_n1_l1)/_ANorm;
+    double B = _ab.calcB(_muNorm*mu_n1_l1)/_BNorm;
 
     for(unsigned int i=0; i<phi.size(); i++){
       for(unsigned int j=0; j<phi.size(); j++){
 	double tmp = 0.0;
 
 	tmp += phi[j][qp];
-	tmp += 0.5*s*(_dt/fs2s(1))*A*(e*Ex_n1_l1/(meV2J(1)/micro2m(1))-s*dmu_dx_n1_l1)*dphidx[j][qp];
-	tmp += -0.5*(_dt/fs2s(1))*B*d2phidx2[j][qp];
+	tmp += 0.5*s*(_dt/_tNorm)*A*(eEx_n1_l1-s*dmu_dx_n1_l1)*dphidx[j][qp];
+	tmp += -0.5*(_dt/_tNorm)*B*d2phidx2[j][qp];
 
 	K(i, j) += JxW[qp]*phi[i][qp]*tmp;
       }
@@ -95,32 +95,32 @@ _add_dKdU_U(DenseSubMatrix<Number> &K, const Elem *elem,
   for(unsigned int qp=0; qp<qrule.n_points(); qp++){
     int ir = _realSGH.getPointInvID(iElem, qp);
     double mu_n1_l1, dmu_dx_n1_l1;
-    double Ex_n1_l1 = 0.0;//_pdm.get_Ex_n1_l1(ir);
+    double eEx_n1_l1 = 0.0;//e*_pdm.get_Ex_n1_l1(ir)/(_eExNorm/_muNorm);
 
     if( s == -1 ){
-      mu_n1_l1 = _pdm.get_mue_n1_l1(ir)/(meV2J(1));
-      dmu_dx_n1_l1 = _pdm.get_dmue_dx_n1_l1(ir)/(meV2J(1)/micro2m(1));
+      mu_n1_l1 = _pdm.get_mue_n1_l1(ir)/_muNorm;
+      dmu_dx_n1_l1 = _pdm.get_dmue_dx_n1_l1(ir)/_dmudxNorm;
     }
     else {
-      mu_n1_l1 = _pdm.get_muh_n1_l1(ir)/(meV2J(1));
-      dmu_dx_n1_l1 = _pdm.get_dmuh_dx_n1_l1(ir)/(meV2J(1)/micro2m(1));
+      mu_n1_l1 = _pdm.get_muh_n1_l1(ir)/_muNorm;
+      dmu_dx_n1_l1 = _pdm.get_dmuh_dx_n1_l1(ir)/_dmudxNorm;
     }
 
-    double A = _ab.calcA((meV2J(1))*mu_n1_l1)/(micro2m(1)*micro2m(1)/(meV2J(1)*fs2s(1)));
-    double dA_dmu = _ab.calc_dA_dmu((meV2J(1))*mu_n1_l1)/(micro2m(1)*micro2m(1)/(meV2J(1)*meV2J(1)*fs2s(1)));
-    double dB_dmu = _ab.calc_dB_dmu((meV2J(1))*mu_n1_l1)/(micro2m(1)*micro2m(1)/(meV2J(1)*fs2s(1)));
+    double A = _ab.calcA(_muNorm*mu_n1_l1)/_ANorm;
+    double dA_dmu = _ab.calc_dA_dmu(_muNorm*mu_n1_l1)/(_ANorm/_muNorm);
+    double dB_dmu = _ab.calc_dB_dmu(_muNorm*mu_n1_l1)/(_BNorm/_muNorm);
 
     for(unsigned int i=0; i<phi.size(); i++){
       for(unsigned int j=0; j<phi.size(); j++){
-	double a = 0.5*s*(_dt/fs2s(1))*phi[j][qp]*dA_dmu*(e*Ex_n1_l1/(meV2J(1)/micro2m(1))-s*dmu_dx_n1_l1);
+	double a = 0.5*s*(_dt/_tNorm)*phi[j][qp]*dA_dmu*(eEx_n1_l1-s*dmu_dx_n1_l1);
 
 	for(unsigned int k=0; k<phi.size(); k++){
 	  double tmp = 0.0;
 	  double Uk = U(dofInd[k]); // ?
 
 	  tmp += a*dphidx[k][qp];
-	  tmp -= 0.5*(_dt/fs2s(1))*A*dphidx[j][qp]*dphidx[k][qp];
-	  tmp -= 0.5*(_dt/fs2s(1))*dB_dmu*phi[j][qp]*d2phidx2[k][qp];
+	  tmp -= 0.5*(_dt/_tNorm)*A*dphidx[j][qp]*dphidx[k][qp];
+	  tmp -= 0.5*(_dt/_tNorm)*dB_dmu*phi[j][qp]*d2phidx2[k][qp];
 
 	  K(i, j) += JxW[qp]*phi[i][qp]*tmp*Uk;
 	}
@@ -154,28 +154,34 @@ _addF(DenseSubVector<Number> &F, const Elem *elem, int iElem,
   for(unsigned int qp=0; qp<qrule.n_points(); qp++){
     int ir = _realSGH.getPointInvID(iElem, qp);
 
-    double C = 0.0;
     double mu_n, dmu_dx_n, d2mu_dx2_n, mu_n1_l1;
-    double Ex_n = 0.0;//_pdm.get_Ex_n(ir);
-    double dEx_dx_n = 0.0;//_pdm.get_dEx_dx_n(ir);
-    double dEx_dx_n1_l1 = 0.0;//_pdm.get_dEx_dx_n1_l1(ir);
+    double eEx_n = 0.0;//e*_pdm.get_Ex_n(ir)/_eExNorm;
+    double edEx_dx_n = 0.0;//e*_pdm.get_dEx_dx_n(ir)/(_eExNorm/_muNorm);
+    double edEx_dx_n1_l1 = 0.0;//e*_pdm.get_dEx_dx_n1_l1(ir)/(_eExNorm/_muNorm);
 
     if( s == -1 ){
-      mu_n = _pdm.get_mue_n(ir)/(meV2J(1));
-      dmu_dx_n = _pdm.get_dmue_dx_n(ir)/(meV2J(1)/micro2m(1));
-      d2mu_dx2_n = _pdm.get_d2mue_dx2_n(ir)/(meV2J(1)/(micro2m(1)*micro2m(1)));
-      mu_n1_l1 = _pdm.get_mue_n1_l1(ir)/(meV2J(1));
+      mu_n = _pdm.get_mue_n(ir)/_muNorm;
+      dmu_dx_n = _pdm.get_dmue_dx_n(ir)/_dmudxNorm;
+      d2mu_dx2_n = _pdm.get_d2mue_dx2_n(ir)/_d2mudx2Norm;
+      mu_n1_l1 = _pdm.get_mue_n1_l1(ir)/_muNorm;
     }
     else {
-      mu_n = _pdm.get_muh_n(ir)/(meV2J(1));
-      dmu_dx_n = _pdm.get_dmuh_dx_n(ir)/(meV2J(1)/micro2m(1));
-      d2mu_dx2_n = _pdm.get_d2muh_dx2_n(ir)/(meV2J(1)/(micro2m(1)*micro2m(1)));
-      mu_n1_l1 = _pdm.get_muh_n1_l1(ir)/(meV2J(1));
+      mu_n = _pdm.get_muh_n(ir)/_muNorm;
+      dmu_dx_n = _pdm.get_dmuh_dx_n(ir)/_dmudxNorm;
+      d2mu_dx2_n = _pdm.get_d2muh_dx2_n(ir)/_d2mudx2Norm;
+      mu_n1_l1 = _pdm.get_muh_n1_l1(ir)/_muNorm;
     }
 
-    C += mu_n-0.5*s*(_dt/fs2s(1))*_ab.calcA((meV2J(1))*mu_n)/(micro2m(1)*micro2m(1)/(meV2J(1)*fs2s(1)))*(e*Ex_n/(meV2J(1)/micro2m(1))-s*dmu_dx_n)*dmu_dx_n;
-    C += 0.5*(_dt/fs2s(1))*_ab.calcB((meV2J(1))*mu_n)/(micro2m(1)*micro2m(1)/(fs2s(1)))*(d2mu_dx2_n-s*e*dEx_dx_n/(meV2J(1)/micro2m(1)));
-    C += -0.5*s*(_dt/fs2s(1))*_ab.calcB((meV2J(1))*mu_n1_l1)/(micro2m(1)*micro2m(1)/(fs2s(1)))*e*dEx_dx_n1_l1/(meV2J(1)/micro2m(1));
+    double An = _ab.calcA(_muNorm*mu_n)/_ANorm;
+    double Bn = _ab.calcB(_muNorm*mu_n)/_BNorm;
+    double Bn1 = _ab.calcB(_muNorm*mu_n1_l1)/_BNorm;
+    double C = 0.0;
+
+    C += mu_n;
+    C += -0.5*s*(_dt/_tNorm)*An*(eEx_n-s*dmu_dx_n)*dmu_dx_n;
+    C += 0.5*(_dt/_tNorm)*Bn*d2mu_dx2_n;
+    C += -0.5*s*(_dt/_tNorm)*Bn*edEx_dx_n;
+    C += -0.5*s*(_dt/_tNorm)*Bn1*edEx_dx_n1_l1;
 
     for(unsigned int i=0; i<phi.size(); i++){
       F(i) += JxW[qp]*phi[i][qp]*C;

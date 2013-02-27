@@ -56,11 +56,13 @@ void GrapheneTransportSolver1D::_setInitialSteadyStateSCF()
     
     se.setAt(i, _fermiDistr.calcConcentrationFermiExact(E));
     sh.setAt(i, _fermiDistr.calcConcentrationFermiExact(-E));
-
+    
     _SigmaElectron.setAt(i, se.getAt(i));
     _SigmaHole.setAt(i, sh.getAt(i));
     _muElectron.setAt(i, E);
     _muHole.setAt(i, -E);
+    //_muElectron.setAt(i, meV2J(100)*exp(-pow(8.0*(_realSGH.getAt(i)-_realSGH.getAt(0)-_difDsc.getLc()/2)/_difDsc.getLc(), 2.0)));
+    //_muHole.setAt(i, meV2J(100)*exp(-pow(8.0*(_realSGH.getAt(i)-_realSGH.getAt(0)-_difDsc.getLc()/2)/_difDsc.getLc(), 2.0)));
   }
 
 

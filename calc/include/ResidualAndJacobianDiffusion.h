@@ -51,7 +51,8 @@ private:
   RealSpaceArrayDiffusion _Ex, _dEx_dx;
   RealSpaceGridHandler _realSGH;
   double _t, _dt;
-
+  double _tNorm, _xNorm, _muNorm, _dmudxNorm, _d2mudx2Norm;
+  double _eExNorm, _ANorm, _BNorm;
 
   void _addK(DenseSubMatrix<Number> &K, const Elem *elem, int iElem,
 	     int s) const;

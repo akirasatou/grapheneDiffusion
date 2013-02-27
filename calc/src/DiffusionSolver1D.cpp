@@ -38,7 +38,6 @@ DiffusionSolver1D(const DiffusionSolver1DDescriptor &difDsc,
 		  PoissonDiffusionMediator &pdm,
 		  double xl, double xr):
   _sysName(difDsc.getFileHeadStr()), _mesh(1), _es(_mesh),
-  //_mRef(_mesh),
   _difDsc(difDsc), _ab(ab), _pdm(pdm),
   _Xl(xl), _Xr(xr), _nSteps(0)
 {
@@ -61,12 +60,21 @@ DiffusionSolver1D(const DiffusionSolver1DDescriptor &difDsc,
 
   sys.assemble_before_solve = false;
 
-  
+
   // Initialize the equation systems.
 
   _es.init();
 
 
+  // Set residual_and_jacobian_object.
+
+  _rj = new ResidualAndJacobianDiffusion(_ab, _pdm, _es.get_mesh(),
+					 sys.get_dof_map(),
+					 getRealSGH());
+  sys.nonlinear_solver->residual_object = _rj;
+  sys.nonlinear_solver->jacobian_object = _rj;
+
+  
   // Setup for the periodic boundary.
 
   _setBoundaryID();
@@ -74,8 +82,8 @@ DiffusionSolver1D(const DiffusionSolver1DDescriptor &difDsc,
   DofMap &dofMap = sys.get_dof_map();
   PeriodicBoundary pbc(RealVectorValue(_difDsc.getLc()/micro2m(1), 0.0, 0.0));
 
-  pbc.myboundary = BoundaryIDLeft;
-  pbc.pairedboundary = BoundaryIDRight;
+  pbc.myboundary = BoundaryIDRight;
+  pbc.pairedboundary = BoundaryIDLeft;
 
   dofMap.add_periodic_boundary(pbc);
 
@@ -91,15 +99,6 @@ DiffusionSolver1D(const DiffusionSolver1DDescriptor &difDsc,
   //_es.parameters.set<Real>("nonlinear solver relative step tolerance") = 1e-5;
 _es.parameters.set<Real>("nonlinear solver relative residual tolerance") = 1e-30;
   _es.parameters.set<unsigned int>("nonlinear solver maximum iterations") = 100;
-
-
-  // Set residual_and_jacobian_object.
-
-  _rj = new ResidualAndJacobianDiffusion(_ab, _pdm, _es.get_mesh(),
-					 sys.get_dof_map(),
-					 getRealSGH());
-  sys.nonlinear_solver->residual_object = _rj;
-  sys.nonlinear_solver->jacobian_object = _rj;
 
 }
 
@@ -156,9 +155,11 @@ void DiffusionSolver1D::_setBoundaryID()
 
 	if( isEqual(xf, _Xl/micro2m(1)) ){
 	  boundaryID = BoundaryIDLeft;
+	  cerr << "Left boundary: " << xf << endl;
 	}
 	else if( isEqual(xf, _Xr/micro2m(1)) ){
 	  boundaryID = BoundaryIDRight;
+	  cerr << "Right boundary: " << xf << endl;
 	}
       }
 
