@@ -1,6 +1,6 @@
 #pragma once
 
-#include "DiffusionSolver1D.h"
+#include "DiffusionSolver1DFD.h"
 #include "RealSpaceGridHandler.h"
 #include "RealSpaceArrayDiffusion.h"
 #include "FermiDistrGraphene.h"
@@ -65,7 +65,7 @@ private:
   const PoissonSolver2DDescriptor &_poiDsc;
   const DiffusionSolver1DDescriptor &_difDsc;
   PoissonSolver2D _poisson;
-  DiffusionSolver1D _diffusion;
+  DiffusionSolver1DFD _diffusion;
   RealSpaceGridHandler _realSGH;
   DiffusionABCalculator _ab;
 

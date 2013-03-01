@@ -52,3 +52,13 @@ void RealSpaceArrayDiffusion::updateInterpolator()
 {
   _csi.update();
 }
+
+
+/*
+ * Return x at i.
+ */
+
+double RealSpaceArrayDiffusion::getX(int i) const
+{
+  return _x[i];
+}

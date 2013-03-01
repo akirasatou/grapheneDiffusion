@@ -11,6 +11,12 @@ using namespace std;
  */
 
 RealSpaceGridHandler::
+RealSpaceGridHandler(const std::vector<double> &x):
+  _x(x)
+{
+}
+
+RealSpaceGridHandler::
 RealSpaceGridHandler(const std::vector<std::vector<double> > &x)
 {
   vector<pair<double, pair<int, int> > > tmp;

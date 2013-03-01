@@ -1,6 +1,6 @@
 Mesh {
-  Nx 300
-  dt 20
+  Nx 60
+  dt 2
 }
 
 Simulation {

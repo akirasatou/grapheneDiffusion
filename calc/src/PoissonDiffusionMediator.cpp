@@ -52,56 +52,16 @@ setInitialSolutions(const RealSpaceArrayDiffusion &mue0,
 
   for(int i=0; i<n; i++){
     _mue_n.setAt(i, mue0.getAt(i));
+    _dmue_dx_n.setAt(i, calc_dmudx(mue0, i));
+    _d2mue_dx2_n.setAt(i, calc_d2mudx2(mue0, i));
+
     _muh_n.setAt(i, muh0.getAt(i));
+    _dmuh_dx_n.setAt(i, calc_dmudx(muh0, i));
+    _d2muh_dx2_n.setAt(i, calc_d2mudx2(muh0, i));
+
     _Ex_n.setAt(i, Ex0.getAt(i));
     _dEx_dx_n.setAt(i, dEx_dx0.getAt(i));
   }
-
-  // Need to calculate $d\mu_{r}/dx$ and $d^{2}\mu_{r}/dx^{2}$
-  // from $\mu_{r}$.
-
-  for(int i=0; i<n; i++){
-    double mue_ip1, mue_im1, muh_ip1, muh_im1;
-    double h_i, h_im1;
-
-    if( i == 0 ){
-      mue_im1 = _mue_n.getAt(n-1);
-      muh_im1 = _muh_n.getAt(n-1);
-      h_im1 = _realSGH.getAt(n-1)-_realSGH.getAt(n-2);
-    }
-    else {
-      mue_im1 = _mue_n.getAt(i-1);
-      muh_im1 = _muh_n.getAt(i-1);
-      h_im1 = _realSGH.getAt(i)-_realSGH.getAt(i-1);
-    }
-
-    if( i == n-1 ){
-      mue_ip1 = _mue_n.getAt(0);
-      muh_ip1 = _muh_n.getAt(0);
-      h_i = _realSGH.getAt(1)-_realSGH.getAt(0);
-    }
-    else {
-      mue_ip1 = _mue_n.getAt(i+1);
-      muh_ip1 = _muh_n.getAt(i+1);
-      h_i = _realSGH.getAt(i+1)-_realSGH.getAt(i);
-    }
-
-    _dmue_dx_n.setAt(i, (mue_ip1-mue_im1)/(h_i+h_im1));
-    _dmuh_dx_n.setAt(i, (muh_ip1-muh_im1)/(h_i+h_im1));
-
-    double d2mue_dx2, d2muh_dx2;
-
-    d2mue_dx2 = (mue_ip1-_mue_n.getAt(i))/h_i;
-    d2mue_dx2 -= (_mue_n.getAt(i)-mue_im1)/h_im1;
-    d2mue_dx2 *= 0.5*(h_i+h_im1);
-    _d2mue_dx2_n.setAt(i, d2mue_dx2);
-
-    d2muh_dx2 = (muh_ip1-_muh_n.getAt(i))/h_i;
-    d2muh_dx2 -= (_muh_n.getAt(i)-muh_im1)/h_im1;
-    d2muh_dx2 *= 0.5*(h_i+h_im1);
-    _d2muh_dx2_n.setAt(i, d2muh_dx2);
-  }
-
 }
 
 
@@ -279,4 +239,131 @@ updateSolutionsNI(const RealSpaceArrayDiffusion &mue,
   fclose(f_Ex);
   */
   _nrStepsNI++;
+}
+
+
+void PoissonDiffusionMediator::
+updateSolutionsNI(const RealSpaceArrayDiffusion &mue,
+		  const RealSpaceArrayDiffusion &muh)
+{
+
+  // Shift the old solutions.
+
+  const int n = _mue_n.getSize();
+
+  for(int i=0; i<n; i++){
+    _mue_n1_l.setAt(i, _mue_n1_l1.getAt(i));
+    _dmue_dx_n1_l.setAt(i, _dmue_dx_n1_l1.getAt(i));
+    _d2mue_dx2_n1_l.setAt(i, _d2mue_dx2_n1_l1.getAt(i));
+
+    _muh_n1_l.setAt(i, _muh_n1_l1.getAt(i));
+    _dmuh_dx_n1_l.setAt(i, _dmuh_dx_n1_l1.getAt(i));
+    _d2muh_dx2_n1_l.setAt(i, _d2muh_dx2_n1_l1.getAt(i));
+
+    _Ex_n1_l.setAt(i, _Ex_n1_l1.getAt(i));
+    _dEx_dx_n1_l.setAt(i, _dEx_dx_n1_l1.getAt(i));
+  }
+
+
+  // Set the current $mu_{r}$ and their derivatives.
+
+  for(int i=0; i<n; i++){
+    _mue_n1_l1.setAt(i, mue.getAt(i));
+    _dmue_dx_n1_l1.setAt(i, calc_dmudx(mue, i));
+    _d2mue_dx2_n1_l1.setAt(i, calc_d2mudx2(mue, i));
+
+    _muh_n1_l1.setAt(i, muh.getAt(i));
+    _dmuh_dx_n1_l1.setAt(i, calc_dmudx(muh, i));
+    _d2muh_dx2_n1_l1.setAt(i, calc_d2mudx2(muh, i));
+  }
+
+
+  // Calculate the charge density from $\mu_{r,n+1}^{(l+1)}$.
+
+  RealSpaceArrayDiffusion se(_realSGH), sh(_realSGH);
+  ChargeDensity2D rho2D(se, sh, _SigmaDope);
+
+  for(int i=0; i<_realSGH.getSize(); i++){
+    se.setAt(i, _fermiDistr.calcConcentrationFermiExact(_mue_n1_l1.getAt(i)));
+    sh.setAt(i, _fermiDistr.calcConcentrationFermiExact(_muh_n1_l1.getAt(i)));
+  }
+
+  rho2D.updateInterpolator();
+
+
+  // Calculate $E_{x,n+1}^{(l+1)}$ and $dE_{x,n+1}^{(l+1)}/dx$.
+
+  _poisson.solveAndCalcField2DEG(_t, _Ex_n1_l1, _dEx_dx_n1_l1, rho2D);
+
+  _nrStepsNI++;
+}
+
+
+/*
+ * Calculate the first and second derivatives of mu at i.
+ */
+
+double PoissonDiffusionMediator::
+calc_dmudx(const RealSpaceArrayDiffusion &mu, int i)
+{
+  const int n = mu.getSize();
+
+  double mu_ip1, mu_im1;
+  double h_i, h_im1;
+
+  if( i == 0 ){
+    mu_im1 = mu.getAt(n-1);
+    h_im1 = mu.getX(n-1)-mu.getX(n-2);
+  }
+  else {
+    mu_im1 = mu.getAt(i-1);
+    h_im1 = mu.getX(i)-mu.getX(i-1);
+  }
+
+  if( i == n-1 ){
+    mu_ip1 = mu.getAt(0);
+    h_i = mu.getX(1)-mu.getX(0);
+  }
+  else {
+    mu_ip1 = mu.getAt(i+1);
+    h_i = mu.getX(i+1)-mu.getX(i);
+  }
+
+  return (mu_ip1-mu_im1)/(h_i+h_im1);
+}
+
+
+double PoissonDiffusionMediator::
+calc_d2mudx2(const RealSpaceArrayDiffusion &mu, int i)
+{
+  const int n = mu.getSize();
+
+  double mu_ip1, mu_im1;
+  double h_i, h_im1;
+
+  if( i == 0 ){
+    mu_im1 = mu.getAt(n-1);
+    h_im1 = mu.getX(n-1)-mu.getX(n-2);
+  }
+  else {
+    mu_im1 = mu.getAt(i-1);
+    h_im1 = mu.getX(i)-mu.getX(i-1);
+  }
+
+  if( i == n-1 ){
+    mu_ip1 = mu.getAt(0);
+    h_i = mu.getX(1)-mu.getX(0);
+  }
+  else {
+    mu_ip1 = mu.getAt(i+1);
+    h_i = mu.getX(i+1)-mu.getX(i);
+  }
+
+  double d2mudx2 = 0.0;
+
+  d2mudx2 += (mu_ip1-mu.getAt(i))/h_i;
+  d2mudx2 -= (mu.getAt(i)-mu_im1)/h_im1;
+  d2mudx2 *= 0.5*(h_i+h_im1);
+
+  return d2mudx2;
 }

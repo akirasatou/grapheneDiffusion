@@ -26,6 +26,8 @@ public:
   void setTime(double t, double dt);
   void setInitialSolutionsNI();
   void updateSolutionsNI(const RealSpaceArrayDiffusion &mue,
+			 const RealSpaceArrayDiffusion &muh);
+  void updateSolutionsNI(const RealSpaceArrayDiffusion &mue,
 			 const RealSpaceArrayDiffusion &dmue_dx,
 			 const RealSpaceArrayDiffusion &d2mue_dx2,
 			 const RealSpaceArrayDiffusion &muh,
@@ -74,7 +76,9 @@ private:
   double _t, _dt;
   int _nrStepsNI;
   const RealSpaceGridHandler &_realSGH;
-
   const FermiDistrGraphene _fermiDistr;
+
+  static double calc_dmudx(const RealSpaceArrayDiffusion &mu, int i);
+  static double calc_d2mudx2(const RealSpaceArrayDiffusion &mu, int i);
 
 };

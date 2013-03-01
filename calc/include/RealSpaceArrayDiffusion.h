@@ -22,6 +22,7 @@ public:
   ~RealSpaceArrayDiffusion();
   double interpolate(double x) const;
   void updateInterpolator();
+  double getX(int i) const;
 
 
 protected:

@@ -13,6 +13,7 @@ class RealSpaceGridHandler: public RealSpaceArray<double>
 
 public:
 
+  RealSpaceGridHandler(const std::vector<double> &x);
   RealSpaceGridHandler(const std::vector<std::vector<double> > &x);
 
   void setAt(int i, double val);
