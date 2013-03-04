@@ -28,14 +28,13 @@ DiffusionSolver1DFD(const DiffusionSolver1DDescriptor &difDsc,
   _sysName(difDsc.getFileHeadStr()), _difDsc(difDsc), _ab(ab),
   _pdm(pdm), _R(_difDsc.getNx()), _U(_difDsc.getNx()),
   _dU(_difDsc.getNx()), _J(_difDsc.getNx(), 0.0),
-  _dx(_difDsc.getLc()/(_difDsc.getNx()-1)),
+  _dx(_difDsc.getLc()/_difDsc.getNx()),
   _Xl(xl), _Xr(xr), _nSteps(0),
   _tNorm(fs2s(1)), _xNorm(micro2m(1)), _muNorm(meV2J(1)),
   _dmudxNorm(_muNorm/_xNorm), _d2mudx2Norm(_muNorm/(_xNorm*_xNorm)),
   _ANorm(_xNorm*_xNorm/(_muNorm*_tNorm)),
   _BNorm(_xNorm*_xNorm/_tNorm), _eExNorm(_muNorm/_xNorm)
 {
-
 }
 
 
@@ -58,7 +57,7 @@ RealSpaceGridHandler DiffusionSolver1DFD::getRealSGH() const
   vector<double> x(_difDsc.getNx());
 
   for(int i=0; i<x.size(); i++){
-    x[i] = i*_difDsc.getLc()/(_difDsc.getNx()-1)+_Xl;
+    x[i] = i*_difDsc.getLc()/_difDsc.getNx()+_Xl;
   }
 
   return RealSpaceGridHandler(x);

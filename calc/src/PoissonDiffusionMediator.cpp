@@ -217,27 +217,6 @@ updateSolutionsNI(const RealSpaceArrayDiffusion &mue,
 
   _poisson.solveAndCalcField2DEG(_t, _Ex_n1_l1, _dEx_dx_n1_l1, rho2D);
 
-  /*
-  FILE *f_mue, *f_muh, *f_Ex;
-  char filename[100];
-
-  sprintf(filename, "dat/mue-t=%05.1ffs-NI=%02d.dat", s2fs(_t), _nrStepsNI);
-  f_mue = fopen(filename, "w");
-  sprintf(filename, "dat/muh-t=%05.1ffs-NI=%02d.dat", s2fs(_t), _nrStepsNI);
-  f_muh = fopen(filename, "w");
-  sprintf(filename, "dat/Ex-t=%05.1ffs-NI=%02d.dat", s2fs(_t), _nrStepsNI);
-  f_Ex = fopen(filename, "w");
-
-  for(int i=0; i<n; i++){
-    fprintf(f_mue, "%g %g\n", _realSGH.getAt(i), J2meV(_mue_n1_l1.getAt(i)));
-    fprintf(f_muh, "%g %g\n", _realSGH.getAt(i), J2meV(_muh_n1_l1.getAt(i)));
-    fprintf(f_Ex, "%g %g\n", _realSGH.getAt(i), _Ex_n1_l1.getAt(i));
-  }
-
-  fclose(f_mue);
-  fclose(f_muh);
-  fclose(f_Ex);
-  */
   _nrStepsNI++;
 }
 
@@ -363,7 +342,7 @@ calc_d2mudx2(const RealSpaceArrayDiffusion &mu, int i)
 
   d2mudx2 += (mu_ip1-mu.getAt(i))/h_i;
   d2mudx2 -= (mu.getAt(i)-mu_im1)/h_im1;
-  d2mudx2 *= 0.5*(h_i+h_im1);
+  d2mudx2 /= 0.5*(h_i+h_im1);
 
   return d2mudx2;
 }

@@ -1,13 +1,13 @@
 Mesh {
-  Nx 60
-  dt 2
+  Nx 500
+  dt 0.1
 }
 
 Simulation {
   Sigma0 0.0
   Lc 3000
   T 300
-  alpha 20
+  alpha 2
   tMax 1000
 }
 
@@ -17,4 +17,5 @@ Output {
   toOutputSS true
   toOutputConcentration true
   toOutputFermiLevel true
+  toOutputField true
 }

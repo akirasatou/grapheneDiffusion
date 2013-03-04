@@ -106,11 +106,12 @@ void GrapheneTransportSolver1D::solveStep()
 
   double t = getTime();
 
-  cerr << t << endl;
-  for(int i=0; i<_poiDsc.getGates().size(); i++){
-    cerr << _poiDsc.getGates()[i]->getVoltage(t) << " ";
-  }
-  cerr << endl;
+  cerr << endl << "t=" << t << endl;
+  cerr << "Vgl=" << _poiDsc.getGates()[0]->getVoltage(t) << " ";
+  cerr << "Vgr=" << _poiDsc.getGates()[1]->getVoltage(t) << endl;
+
+  cerr << "Ne=" << _SigmaElectron.calcTotalConcentration() << " ";
+  cerr << "Nh=" << _SigmaHole.calcTotalConcentration() << endl;
 
   _diffusion.solveStep(t, _difDsc.get_dt());
 

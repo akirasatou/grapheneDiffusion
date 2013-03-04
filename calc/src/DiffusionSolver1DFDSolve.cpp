@@ -22,7 +22,7 @@ void DiffusionSolver1DFD::solveStep(double t, double dt)
 
   RealSpaceArrayDiffusion mue(getRealSGH()), muh(getRealSGH());
   const int size = mue.getSize(), lMax = 100;
-  const double tol = 1e-8;
+  const double tol = 1e-10;
   int l;
 
   cerr << "nonlinear iteration" << endl;
@@ -71,6 +71,7 @@ void DiffusionSolver1DFD::solveStep(double t, double dt)
   // Update the solutions to the next time step.
 
   _pdm.updateSolutions();
+
   _nSteps++;
 }
 
@@ -97,6 +98,8 @@ void DiffusionSolver1DFD::_calcRJ(const Vector &U, double dt, int sr)
   // J = K+(\partial K/\partial U)U.
 
   for(int i=0; i<size; i++){
+    for(int j=0; j<size; j++) _J.setAt(i, j, 0.0);
+
     for(int j=i-1; j<=i+1; j++){
       _J.setAt(i, _get_jd(j, size), _calcK(i, j, U, dt, sr));
       _J.addAt(i, _get_jd(j, size), _calc_dKdU_U(i, j, U, dt, sr));
@@ -124,9 +127,9 @@ int DiffusionSolver1DFD::_get_jd(int j, int size)
 double DiffusionSolver1DFD::_calcF(int i, double dt, int sr) const
 {
   double mu_n, dmu_dx_n, d2mu_dx2_n, mu_n1_l1;
-  double eEx_n = 0.0;//e*_pdm.get_Ex_n(i)/_eExNorm;
-  double edEx_dx_n = 0.0;//e*_pdm.get_dEx_dx_n(i)/(_eExNorm/_muNorm);
-  double edEx_dx_n1_l1 = 0.0;//e*_pdm.get_dEx_dx_n1_l1(i)/(_eExNorm/_muNorm);
+  double eEx_n = e*_pdm.get_Ex_n(i)/_eExNorm;
+  double edEx_dx_n = e*_pdm.get_dEx_dx_n(i)/(_eExNorm/_muNorm);
+  double edEx_dx_n1_l1 = e*_pdm.get_dEx_dx_n1_l1(i)/(_eExNorm/_muNorm);
 
   if( sr == -1 ){
     mu_n = _pdm.get_mue_n(i)/_muNorm;
@@ -167,7 +170,7 @@ _calcK(int i, int j, const Vector &U, double dt, int sr) const
 
   const int size = U.size();
   double mu, mu_ip1, mu_im1;
-  double eEx = 0.0;//e*_pdm.get_Ex_n1_l1(i)/_eExNorm;
+  double eEx = e*_pdm.get_Ex_n1_l1(i)/_eExNorm;
 
   if( sr == -1 ){
     mu = _pdm.get_mue_n1_l1(i)/_muNorm;
@@ -192,7 +195,7 @@ _calcK(int i, int j, const Vector &U, double dt, int sr) const
 
   r = sd*0.5*sr*0.5*(dt/_tNorm)*(_dx/_xNorm)*A;
   r *= (_dx/_xNorm)*eEx-0.5*sr*(mu_ip1-mu_im1);
-  r +- -0.5*(dt/_tNorm)*B;
+  r += -0.5*(dt/_tNorm)*B;
 
   return r;
 }
@@ -209,7 +212,7 @@ _calc_dKdU_U(int i, int j, const Vector &U, double dt, int sr) const
 
   const int size = U.size();
   double mu, mu_ip1, mu_im1;
-  double eEx = 0.0;//e*_pdm.get_Ex_n1_l1(i)/_eExNorm;
+  double eEx = e*_pdm.get_Ex_n1_l1(i)/_eExNorm;
 
   if( sr == -1 ){
     mu = _pdm.get_mue_n1_l1(i)/_muNorm;
