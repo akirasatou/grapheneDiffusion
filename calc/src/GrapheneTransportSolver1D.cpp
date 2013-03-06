@@ -132,8 +132,8 @@ void GrapheneTransportSolver1D::solveStep()
 
   // Output.
 
-  int n_output_step = (int)round(_difDsc.get_tOutputStep()/_difDsc.get_dt());
-  int n_outputBin_step = (int)round(_difDsc.get_tOutputBinStep()/_difDsc.get_dt());
+  int n_output_step = _difDsc.get_nOutputStep();
+  int n_outputBin_step = _difDsc.get_nOutputBinStep();
   char filehead[300];
 
   /*
@@ -144,7 +144,7 @@ void GrapheneTransportSolver1D::solveStep()
     }
   }
   */
-  /*  
+
   if(_nSteps%n_output_step == 0){
     if( _difDsc.toOutputFermiLevel() ){
       sprintf(filehead, "mu-t=%04.0ffs", s2fs(t));
@@ -167,7 +167,7 @@ void GrapheneTransportSolver1D::solveStep()
       outputVelocity(_velDir.c_str(), filehead);
     }
   }
-  */
+
   //MPI_Barrier(_gridParam.getWorld());
 
 

@@ -78,8 +78,7 @@ void GrapheneTransportSolver1D::_setInitialSteadyStateSCF()
   }
 
   rho2D.updateInterpolator();
-  _poisson.solveAndCalcField2DEG(_difDsc.get_dt()/1000, Ex, dEx_dx,
-				 rho2D);
+  _poisson.solveAndCalcField2DEG(0.0, Ex, dEx_dx, rho2D);
 
 
   // Set the initial solutions to the holder.

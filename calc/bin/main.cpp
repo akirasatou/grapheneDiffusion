@@ -67,7 +67,6 @@ int main(int argc, char *argv[])
 
   // Initialize the solver.
 
-  const double dt = difDsc.get_dt();
   GrapheneTransportSolver1D solver(poiDsc, difDsc, odm);
 
 

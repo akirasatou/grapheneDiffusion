@@ -21,7 +21,8 @@ class DiffusionSolver1DDescriptor
   inline const std::string getFileHeadStr() const { return _fileHeadStr; }
 
   inline int getNx() const { return _Nx; }
-  inline double get_dt() const { return _dt; }
+  inline double get_dtMax() const { return _dtMax; }
+  inline double get_dmuMax() const { return _dmuMax; }
 
   inline double getLc() const { return _Lc; }
   inline double getSigma0() const { return _Sigma0; }
@@ -29,8 +30,8 @@ class DiffusionSolver1DDescriptor
   inline double get_alpha() const { return _alpha; }
   inline double get_tMax() const { return _tMax; }
 
-  inline double get_tOutputStep() const { return _tOutputStep; }
-  inline double get_tOutputBinStep() const { return _tOutputBinStep; }
+  inline int get_nOutputStep() const { return _nOutputStep; }
+  inline int get_nOutputBinStep() const { return _nOutputBinStep; }
   inline bool toOutputSS() const { return _toOutputSS; }
   inline bool toOutputFermiLevel() const { return _toOutputFermiLevel; }
   inline bool toOutputConcentration() const { return _toOutputConcentration; }
@@ -50,7 +51,7 @@ class DiffusionSolver1DDescriptor
   void _readDsc();
 
   int _Nx;
-  double _dt;
+  double _dtMax, _dmuMax;
   void _registerMeshSection();
   void _setMeshSection();
 
@@ -58,7 +59,7 @@ class DiffusionSolver1DDescriptor
   void _registerSimulationSection();
   void _setSimulationSection();
 
-  double _tOutputStep, _tOutputBinStep;
+  int _nOutputStep, _nOutputBinStep;
   bool _toOutputSS, _toOutputFermiLevel, _toOutputConcentration;
   bool _toOutputPotential2D, _toOutputField, _toOutputVelocity;
   void _registerOutputSection();

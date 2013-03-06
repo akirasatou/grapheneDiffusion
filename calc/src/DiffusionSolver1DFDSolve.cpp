@@ -274,11 +274,6 @@ _calc_dKdU_U(int i, int j, const Vector &U, double dt, int sr) const
 
 double DiffusionSolver1DFD::_calcNextTimeStep(double t) const
 {
-  // Maximum allowed change in $\mu$.
-
-  double dmuMax = meV2J(0.1);
-
-
   // Find the maximum $F$ in the diffusion equation.
 
   double Fmax = 0.0;
@@ -293,7 +288,7 @@ double DiffusionSolver1DFD::_calcNextTimeStep(double t) const
 
   // Set the upper bound on the time step.
 
-  return  min(dmuMax/Fmax, fs2s(100));
+  return  min(_difDsc.get_dmuMax()/Fmax, _difDsc.get_dtMax());
 }
 
 

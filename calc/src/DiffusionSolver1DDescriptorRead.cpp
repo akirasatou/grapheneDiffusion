@@ -15,7 +15,9 @@ using namespace std;
  * Mesh parameters (compulsory):
  *
  * Nx --- The (approximate) number of points in the $x$-mesh: Nx>=50.
- * dt --- Time step (in fs).
+ * dtMax --- Maximum time step bounding the adaptive one (in fs).
+ * dmuMax --- Maximum allowed change in $\mu$ by one time step 
+ *            (in meV).
  *
  *
  * Simulation parameters (compulsory):
@@ -34,11 +36,11 @@ using namespace std;
  *
  * Output parameters (compulsory):
  *
- * tOutputStep --- Time interval at which the ascii output are 
- *                 generated (in fs).
- * tOutputBinStep --- Time interval at which the binary output are 
- *                    generated (in fs):
- *                    Default value: tOutputStep.
+ * nOutputStep --- Number of time steps by which the ascii output are 
+ *                 generated.
+ * nOutputBinStep --- Number of time steps by which the binary output
+ *                    are generated:
+ *                    Default value: nOutputStep.
  * toOutput* --- whether to output concentration, field, and so on.
  *               Default value: false.
  * 
@@ -78,9 +80,13 @@ void DiffusionSolver1DDescriptor::_registerMeshSection()
   secMesh.registerParameterIntNoDefault("Nx");
   secMesh.getParameter("Nx").setPVC(new PVCIntGEQ(50));
 
-  secMesh.registerParameterDoubleNoDefault("dt");
-  secMesh.getParameter("dt").setPVC(new PVCDoubleGEQ(0.0));
-  secMesh.getParameter("dt").setPPP(new PPPDoubleMultiply(fs2s(1)));
+  secMesh.registerParameterDoubleNoDefault("dtMax");
+  secMesh.getParameter("dtMax").setPVC(new PVCDoubleGEQ(0.0));
+  secMesh.getParameter("dtMax").setPPP(new PPPDoubleMultiply(fs2s(1)));
+
+  secMesh.registerParameterDoubleNoDefault("dmuMax");
+  secMesh.getParameter("dmuMax").setPVC(new PVCDoubleGEQ(0.0));
+  secMesh.getParameter("dmuMax").setPPP(new PPPDoubleMultiply(meV2J(1)));
 }
 
 void DiffusionSolver1DDescriptor::_registerSimulationSection()
@@ -109,13 +115,11 @@ void DiffusionSolver1DDescriptor::_registerOutputSection()
 {
   Section &secOutput = _sysDsc.registerSection("Output");
 
-  secOutput.registerParameterDoubleNoDefault("tOutputStep");
-  secOutput.getParameter("tOutputStep").setPVC(new PVCDoubleGEQ(0.0));
-  secOutput.getParameter("tOutputStep").setPPP(new PPPDoubleMultiply(fs2s(1)));
+  secOutput.registerParameterIntNoDefault("nOutputStep");
+  secOutput.getParameter("nOutputStep").setPVC(new PVCIntGEQ(1));
 
-  secOutput.registerParameterDoubleWithDefault("tOutputBinStep", 0.0);
-  secOutput.getParameter("tOutputBinStep").setPVC(new PVCDoubleGEQ(0.0));
-  secOutput.getParameter("tOutputBinStep").setPPP(new PPPDoubleMultiply(fs2s(1)));
+  secOutput.registerParameterIntWithDefault("nOutputBinStep", 0);
+  secOutput.getParameter("nOutputBinStep").setPVC(new PVCIntGEQ(1));
 
   const char *boolTab[2] = {"true", "false"};
 
@@ -149,7 +153,7 @@ void DiffusionSolver1DDescriptor::_setMeshSection()
   Section &secMesh = _sysDsc.getSection("Mesh");
   
   _Nx = secMesh.getParameter("Nx").getInt();
-  _dt = secMesh.getParameter("dt").getDouble();
+  _dtMax = secMesh.getParameter("dtMax").getDouble();
 }
 
 void DiffusionSolver1DDescriptor::_setSimulationSection()
@@ -177,11 +181,11 @@ void DiffusionSolver1DDescriptor::_setOutputSection()
 
   Section &secOutput = _sysDsc.getSection("Output");
   
-  _tOutputStep = secOutput.getParameter("tOutputStep").getDouble();
-  _tOutputBinStep = secOutput.getParameter("tOutputBinStep").getDouble();
+  _nOutputStep = secOutput.getParameter("nOutputStep").getInt();
+  _nOutputBinStep = secOutput.getParameter("nOutputBinStep").getInt();
 
-  if( _tOutputBinStep < fs2s(1e-5) ){
-    _tOutputBinStep = _tOutputStep;
+  if( _nOutputBinStep == 0 ){
+    _nOutputBinStep = _nOutputStep;
   }
 
   _toOutputSS = (secOutput.getParameter("toOutputSS").getString()=="true");
