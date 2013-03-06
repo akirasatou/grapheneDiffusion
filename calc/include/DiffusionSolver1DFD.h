@@ -26,7 +26,7 @@ public:
 		      double xl, double xr);
   ~DiffusionSolver1DFD();
   RealSpaceGridHandler getRealSGH() const;
-  void solveStep(double t);
+  double solveStep(double t);
 
 
 private:

@@ -106,14 +106,15 @@ void GrapheneTransportSolver1D::solveStep()
 
   double t = getTime();
 
-  cerr << endl << "t=" << t << endl;
+  cerr << endl << "t=" << s2fs(t) << endl;
+  /*
   cerr << "Vgl=" << _poiDsc.getGates()[0]->getVoltage(t) << " ";
   cerr << "Vgr=" << _poiDsc.getGates()[1]->getVoltage(t) << endl;
-
+  */
   cerr << "Ne=" << _SigmaElectron.calcTotalConcentration() << " ";
   cerr << "Nh=" << _SigmaHole.calcTotalConcentration() << endl;
 
-  _diffusion.solveStep(t);
+  _t += _diffusion.solveStep(t);
 
 
   // Get the current solutions from the holder.
@@ -143,7 +144,7 @@ void GrapheneTransportSolver1D::solveStep()
     }
   }
   */
-  
+  /*  
   if(_nSteps%n_output_step == 0){
     if( _difDsc.toOutputFermiLevel() ){
       sprintf(filehead, "mu-t=%04.0ffs", s2fs(t));
@@ -166,7 +167,7 @@ void GrapheneTransportSolver1D::solveStep()
       outputVelocity(_velDir.c_str(), filehead);
     }
   }
-
+  */
   //MPI_Barrier(_gridParam.getWorld());
 
 

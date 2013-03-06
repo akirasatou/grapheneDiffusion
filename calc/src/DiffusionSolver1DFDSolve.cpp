@@ -10,7 +10,7 @@ using namespace std;
  * Solve the diffusion equation for the next time step.
  */
 
-void DiffusionSolver1DFD::solveStep(double t)
+double DiffusionSolver1DFD::solveStep(double t)
 {
 
   // Calculate the adaptive time step to reduce the numerical error.
@@ -31,7 +31,7 @@ void DiffusionSolver1DFD::solveStep(double t)
   const double tol = 1e-10;
   int l;
 
-  cerr << "nonlinear iteration" << endl;
+  //cerr << "nonlinear iteration" << endl;
 
   for(l=1; l<=lMax; l++){
     double err = 0.0;
@@ -60,10 +60,10 @@ void DiffusionSolver1DFD::solveStep(double t)
 
 
     // Convergence check.
-
+    /*
     cerr << "l=" << l << endl;
     cerr << "err=" << err << endl;
-
+    */
     if( err < tol ) break;
   }
 
@@ -77,6 +77,8 @@ void DiffusionSolver1DFD::solveStep(double t)
   // Update the solutions to the next time step.
 
   _pdm.updateSolutions();
+
+  return dt;
 }
 
 
@@ -301,5 +303,27 @@ double DiffusionSolver1DFD::_calcNextTimeStep(double t) const
 
 double DiffusionSolver1DFD::_calcFInDiffusionEq(int i, int sr) const
 {
-  return 0.0;
+  double mu_n, dmu_dx_n, d2mu_dx2_n;
+  double eEx_n = e*_pdm.get_Ex_n(i);
+  double edEx_dx_n = e*_pdm.get_dEx_dx_n(i);
+
+  if( sr == -1 ){
+    mu_n = _pdm.get_mue_n(i);
+    dmu_dx_n = _pdm.get_dmue_dx_n(i);
+    d2mu_dx2_n = _pdm.get_d2mue_dx2_n(i);
+  }
+  else {
+    mu_n = _pdm.get_muh_n(i);
+    dmu_dx_n = _pdm.get_dmuh_dx_n(i);
+    d2mu_dx2_n = _pdm.get_d2muh_dx2_n(i);
+  }
+
+  double An = _ab.calcA(mu_n);
+  double Bn = _ab.calcB(mu_n);
+  double r = 0.0;
+
+  r += -sr*_ab.calcA(mu_n)*(eEx_n-sr*dmu_dx_n)*dmu_dx_n;
+  r += _ab.calcB(mu_n)*d2mu_dx2_n-sr*Bn*edEx_dx_n;
+
+  return r;
 }
