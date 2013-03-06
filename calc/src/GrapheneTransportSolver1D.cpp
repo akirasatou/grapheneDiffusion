@@ -25,8 +25,8 @@ GrapheneTransportSolver1D(const PoissonSolver2DDescriptor &poiDsc,
   _SigmaDope(_realSGH), _Ex(_realSGH),
   _muElectron(_realSGH), _muHole(_realSGH),
   _fermiDistr(_difDsc.getT()),
-  _pdm(_realSGH, _poisson, _SigmaDope, _fermiDistr),
-  _nSteps(0), _odm(odm)
+  _pdm(_realSGH, _poisson, _SigmaDope, _fermiDistr), 
+  _nSteps(0), _t(0.0), _odm(odm)
 {
 
   // Check the validity of descriptors.
@@ -113,7 +113,7 @@ void GrapheneTransportSolver1D::solveStep()
   cerr << "Ne=" << _SigmaElectron.calcTotalConcentration() << " ";
   cerr << "Nh=" << _SigmaHole.calcTotalConcentration() << endl;
 
-  _diffusion.solveStep(t, _difDsc.get_dt());
+  _diffusion.solveStep(t);
 
 
   // Get the current solutions from the holder.
@@ -182,7 +182,8 @@ void GrapheneTransportSolver1D::solveStep()
 
 double GrapheneTransportSolver1D::getTime() const
 {
-  return _nSteps*_difDsc.get_dt();
+  return _t;
+  //return _nSteps*_difDsc.get_dt();
 }
 
 

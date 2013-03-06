@@ -10,8 +10,14 @@ using namespace std;
  * Solve the diffusion equation for the next time step.
  */
 
-void DiffusionSolver1DFD::solveStep(double t, double dt)
+void DiffusionSolver1DFD::solveStep(double t)
 {
+
+  // Calculate the adaptive time step to reduce the numerical error.
+
+  double dt = _calcNextTimeStep(t);
+
+
   // Set the solutions of the previous time step as the start of
   // the nonlinear iteration: $\mu_{r, n+1}^{(l=0)} <- \mu_{r,n}$.
 
@@ -71,8 +77,6 @@ void DiffusionSolver1DFD::solveStep(double t, double dt)
   // Update the solutions to the next time step.
 
   _pdm.updateSolutions();
-
-  _nSteps++;
 }
 
 
@@ -97,9 +101,9 @@ void DiffusionSolver1DFD::_calcRJ(const Vector &U, double dt, int sr)
 
   // J = K+(\partial K/\partial U)U.
 
-  for(int i=0; i<size; i++){
-    for(int j=0; j<size; j++) _J.setAt(i, j, 0.0);
+  _J.setZeros();
 
+  for(int i=0; i<size; i++){
     for(int j=i-1; j<=i+1; j++){
       _J.setAt(i, _get_jd(j, size), _calcK(i, j, U, dt, sr));
       _J.addAt(i, _get_jd(j, size), _calc_dKdU_U(i, j, U, dt, sr));
@@ -122,14 +126,15 @@ int DiffusionSolver1DFD::_get_jd(int j, int size)
 
 /*
  * Calculate F.
+ * Be cautious about the normalization.
  */
 
 double DiffusionSolver1DFD::_calcF(int i, double dt, int sr) const
 {
   double mu_n, dmu_dx_n, d2mu_dx2_n, mu_n1_l1;
   double eEx_n = e*_pdm.get_Ex_n(i)/_eExNorm;
-  double edEx_dx_n = e*_pdm.get_dEx_dx_n(i)/(_eExNorm/_muNorm);
-  double edEx_dx_n1_l1 = e*_pdm.get_dEx_dx_n1_l1(i)/(_eExNorm/_muNorm);
+  double edEx_dx_n = e*_pdm.get_dEx_dx_n(i)/(_eExNorm/_xNorm);
+  double edEx_dx_n1_l1 = e*_pdm.get_dEx_dx_n1_l1(i)/(_eExNorm/_xNorm);
 
   if( sr == -1 ){
     mu_n = _pdm.get_mue_n(i)/_muNorm;
@@ -161,6 +166,7 @@ double DiffusionSolver1DFD::_calcF(int i, double dt, int sr) const
 
 /*
  * Calculate K.
+ * Be cautious about the normalization.
  */
 
 double DiffusionSolver1DFD::
@@ -203,6 +209,7 @@ _calcK(int i, int j, const Vector &U, double dt, int sr) const
 
 /*
  * Calculate \frac{\partial K}{\partial U} U.
+ * Be cautious about the normalization.
  */
 
 double DiffusionSolver1DFD::
@@ -256,4 +263,43 @@ _calc_dKdU_U(int i, int j, const Vector &U, double dt, int sr) const
   }
 
   return dKdU_U;
+}
+
+
+/*
+ * Calculate the time step to reduce the numerical error.
+ */
+
+double DiffusionSolver1DFD::_calcNextTimeStep(double t) const
+{
+  // Maximum allowed change in $\mu$.
+
+  double dmuMax = meV2J(0.1);
+
+
+  // Find the maximum $F$ in the diffusion equation.
+
+  double Fmax = 0.0;
+
+  for(int i=0; i<_difDsc.getNx(); i++){
+    double Fe = fabs(_calcFInDiffusionEq(i, -1));
+    double Fh = fabs(_calcFInDiffusionEq(i, +1));
+
+    Fmax = max(Fmax, max(Fe, Fh));
+  }
+
+
+  // Set the upper bound on the time step.
+
+  return  min(dmuMax/Fmax, fs2s(100));
+}
+
+
+/*
+ * Calculate $F$ in the diffusion equation.
+ */
+
+double DiffusionSolver1DFD::_calcFInDiffusionEq(int i, int sr) const
+{
+  return 0.0;
 }

@@ -8,7 +8,7 @@ Simulation {
   Lc 3000
   T 300
   alpha 2
-  tMax 1000
+  tMax 4000
 }
 
 Output {

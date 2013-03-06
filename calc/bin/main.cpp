@@ -73,10 +73,7 @@ int main(int argc, char *argv[])
 
   // Time step.
 
-  double t_max = difDsc.get_tMax();
-  int n_max = (int)ceil(t_max/dt);
-
-  for(int n=0; n<=n_max; n++){
+  while( solver.getTime() <= difDsc.get_tMax() ){
     solver.solveStep();
   }
 

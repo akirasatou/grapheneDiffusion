@@ -81,6 +81,7 @@ private:
   GridParameter _gridParam;
   */
   int _nSteps;
+  double _t;
 
   OutputDirectoryManager _odm;
   std::string _SSDir, _muDir, _concDir, _pot2DDir, _fieldDir, _velDir;
