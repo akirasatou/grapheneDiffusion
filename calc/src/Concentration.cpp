@@ -35,8 +35,7 @@ Concentration::~Concentration()
 double Concentration::calcTotalConcentration() const
 {
   int N = _realSGH.getSize();
-
-
+  
   for(int i=0; i<N; i++){
     _xTab[i] = _realSGH.getAt(i);
     _integrandX[i] = getAt(i);

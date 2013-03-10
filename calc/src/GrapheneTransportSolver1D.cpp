@@ -106,16 +106,18 @@ void GrapheneTransportSolver1D::solveStep()
 
   double t = getTime();
 
-  cerr << endl << "t=" << s2fs(t) << endl;
+  //cerr << endl << "t=" << s2fs(t) << endl;
   /*
   cerr << "Vgl=" << _poiDsc.getGates()[0]->getVoltage(t) << " ";
   cerr << "Vgr=" << _poiDsc.getGates()[1]->getVoltage(t) << endl;
   */
+  /*
   cerr << "Ne=" << _SigmaElectron.calcTotalConcentration() << " ";
   cerr << "Nh=" << _SigmaHole.calcTotalConcentration() << endl;
-
+  */
   _t += _diffusion.solveStep(t);
 
+  cerr << s2fs(_t) << " " << _SigmaElectron.calcTotalConcentration() << endl;
 
   // Get the current solutions from the holder.
 
@@ -147,23 +149,23 @@ void GrapheneTransportSolver1D::solveStep()
 
   if(_nSteps%n_output_step == 0){
     if( _difDsc.toOutputFermiLevel() ){
-      sprintf(filehead, "mu-t=%04.0ffs", s2fs(t));
+      sprintf(filehead, "mu-n=%05d-t=%gfs", _nSteps, s2fs(t));
       outputFermiLevel2DEG(_muDir.c_str(), filehead);
     }
     if( _difDsc.toOutputConcentration() ){
-      sprintf(filehead, "conc-t=%04.0ffs", s2fs(t));
+      sprintf(filehead, "conc-n=%05d-t=%gfs", _nSteps, s2fs(t));
       outputConcentration2DEG(_concDir.c_str(), filehead);
     }
     if( _difDsc.toOutputPotential2D() ){
-      sprintf(filehead, "phi-t=%04.0ffs", s2fs(t));
+      sprintf(filehead, "phi-n=%05d-t=%gfs", _nSteps, s2fs(t));
       outputPotential(_pot2DDir.c_str(), filehead);
     }
     if( _difDsc.toOutputField() ){
-      sprintf(filehead, "field-t=%04.0ffs", s2fs(t));
+      sprintf(filehead, "field-n=%05d-t=%gfs", _nSteps, s2fs(t));
       outputField2DEG(_fieldDir.c_str(), filehead);
     }
     if( _difDsc.toOutputVelocity() ){
-      sprintf(filehead, "vel-t=%04.0ffs", s2fs(t));
+      sprintf(filehead, "vel-n=%05d-t=%gfs", _nSteps, s2fs(t));
       outputVelocity(_velDir.c_str(), filehead);
     }
   }

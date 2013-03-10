@@ -1,5 +1,6 @@
 #include "DiffusionSolver1DFD.h"
 #include "RealSpaceArrayDiffusion.h"
+#include "Concentration.h"
 #include <PhysicalUnits.h>
 #include <algorithm>
 
@@ -12,7 +13,6 @@ using namespace std;
 
 double DiffusionSolver1DFD::solveStep(double t)
 {
-
   // Calculate the adaptive time step to reduce the numerical error.
 
   double dt = _calcNextTimeStep(t);
@@ -26,9 +26,10 @@ double DiffusionSolver1DFD::solveStep(double t)
 
   // Solve the diffusion equation by nonlinear Newton iteration.
 
-  RealSpaceArrayDiffusion mue(getRealSGH()), muh(getRealSGH());
-  const int size = mue.getSize(), lMax = 100;
-  const double tol = 1e-10;
+  RealSpaceGridHandler realSGH(getRealSGH());
+  RealSpaceArrayDiffusion mue(realSGH), muh(realSGH);
+  const int size = mue.getSize(), lMax = 500;
+  const double tol = 1e-7;
   int l;
 
   //cerr << "nonlinear iteration" << endl;
@@ -201,7 +202,7 @@ _calcK(int i, int j, const Vector &U, double dt, int sr) const
   double r;
   int sd = j-i;
 
-  r = sd*0.5*sr*0.5*(dt/_tNorm)*(_dx/_xNorm)*A;
+  r = sd*0.5*sr*0.5*(dt/_tNorm)*A;
   r *= (_dx/_xNorm)*eEx-0.5*sr*(mu_ip1-mu_im1);
   r += -0.5*(dt/_tNorm)*B;
 
@@ -245,7 +246,7 @@ _calc_dKdU_U(int i, int j, const Vector &U, double dt, int sr) const
     dKdU[1] = (dt/_tNorm)*dB_dmu;
     
     for(int s=-1; s<=1; s+=2){
-      dKdU[s+1] = s*0.5*sr*0.5*(dt/_tNorm)*(_dx/_xNorm)*dA_dmu;
+      dKdU[s+1] = s*0.5*sr*0.5*(dt/_tNorm)*dA_dmu;
       dKdU[s+1] *= (_dx/_xNorm)*eEx-0.5*sr*(mu_ip1-mu_im1);
       dKdU[s+1] += -0.5*(dt/_tNorm)*dB_dmu;
     }
@@ -256,7 +257,7 @@ _calc_dKdU_U(int i, int j, const Vector &U, double dt, int sr) const
     int sd = j-i;
 
     for(int s=-1; s<=1; s+=2){
-      dKdU[s+1] = -s*sd*0.25*0.5*(dt/_tNorm)*(_dx/_xNorm)*A;
+      dKdU[s+1] = -s*sd*0.25*0.5*(dt/_tNorm)*A;
     }
   }
 

@@ -56,3 +56,15 @@ double DiffusionABCalculator::calc_dB_dmu(double mu) const
 
   return c*oolog/((1+expmx)*(1+expmx))*(-oolog+expmx);
 }
+
+
+/*
+ * Calculate $d\rho_{r}/d\mu_{r}$.
+ */
+
+double DiffusionABCalculator::calc_drho_dmu(double mu, int sr) const
+{
+  double x = mu*_ookBT;
+
+  return sr*2*e*kB*_T/(pi*vF*vF*hbar*hbar)*log(1+exp(x));
+}

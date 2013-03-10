@@ -13,6 +13,7 @@ public:
   
   DiffusionABCalculator(double T, double alpha);
 
+  double calc_drho_dmu(double mu, int sr) const;
   double calcA(double mu) const;
   double calcB(double mu) const;
   double calc_dA_dmu(double mu) const;

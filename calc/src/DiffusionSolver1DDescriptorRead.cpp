@@ -154,6 +154,7 @@ void DiffusionSolver1DDescriptor::_setMeshSection()
   
   _Nx = secMesh.getParameter("Nx").getInt();
   _dtMax = secMesh.getParameter("dtMax").getDouble();
+  _dmuMax = secMesh.getParameter("dmuMax").getDouble();
 }
 
 void DiffusionSolver1DDescriptor::_setSimulationSection()

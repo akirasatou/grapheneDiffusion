@@ -1,7 +1,7 @@
 Mesh {
-  Nx 500
+  Nx 300
   dmuMax 0.1
-  dtMax 100
+  dtMax 1
 }
 
 Simulation {
@@ -9,11 +9,11 @@ Simulation {
   Lc 3000
   T 300
   alpha 2
-  tMax 4000
+  tMax 10000
 }
 
 Output {
-  nOutputStep 20
+  nOutputStep 50
   nOutputBinStep 100000
   toOutputSS true
   toOutputConcentration true
