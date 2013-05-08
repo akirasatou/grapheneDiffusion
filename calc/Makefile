@@ -25,5 +25,11 @@ TARGETS = ${patsubst bin/%.cpp, %, ${SRCS_MAIN}}
 main:  ${OBJS_WOMAIN} bin/main.o
 	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
 
+mainTimeDep:  ${OBJS_WOMAIN} bin/mainTimeDep.o
+	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
+
+testTR:  ${OBJS_WOMAIN} bin/testTR.o
+	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
+
 clean:
 	rm -f ${OBJS_WOMAIN} ${OBJS_MAIN} *~ src/*~ bin/*~ include/*~ bin/*.o

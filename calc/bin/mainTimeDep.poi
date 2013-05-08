@@ -15,7 +15,7 @@ Gate {
   Ng 2
   Vg 5*(1-tanh((t+1e-18)/1e-20))/2 -5*(1-tanh((t+1e-18)/1e-20))/2
   Lg 1000
-  Wg 50
+  Wg 1000
   tg 10
   sg 500
 }
@@ -24,7 +24,7 @@ BottomGate {
   bottomNg 2
   bottomVg 5*(1-tanh((t+1e-18)/1e-20))/2 -5*(1-tanh((t+1e-18)/1e-20))/2
   bottomLg 1000
-  bottomWg 50
+  bottomWg 1000
   bottom_tg 10
   bottom_sg 500
 }
