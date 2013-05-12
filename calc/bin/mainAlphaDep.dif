@@ -1,0 +1,22 @@
+Mesh {
+  Nx 300
+  dmuMax 0.1
+  dtMax 1
+}
+
+Simulation {
+  Sigma0 0.0
+  Lc 3000
+  T 300
+  alpha 2
+  tMax 20000
+}
+
+Output {
+  nOutputStep 50
+  nOutputBinStep 100000
+  toOutputSS false
+  toOutputConcentration false
+  toOutputFermiLevel true
+  toOutputField false
+}

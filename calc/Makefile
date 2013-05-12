@@ -28,6 +28,9 @@ main:  ${OBJS_WOMAIN} bin/main.o
 mainTimeDep:  ${OBJS_WOMAIN} bin/mainTimeDep.o
 	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
 
+mainAlphaDep:  ${OBJS_WOMAIN} bin/mainAlphaDep.o
+	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
+
 testTR:  ${OBJS_WOMAIN} bin/testTR.o
 	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
 
