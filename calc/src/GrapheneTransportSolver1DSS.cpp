@@ -86,9 +86,11 @@ void GrapheneTransportSolver1D::_setInitialSteadyStateSCF()
 
   // Output the field and concentration.
 
-  outputField2DEG(_SSDir.c_str(), "Ex-SS", Ex);
-  outputConcentration2DEG(_SSDir.c_str(), "conc-SS", se, sh);
-  outputFermiLevel2DEG(_SSDir.c_str(), "mu-SS");
+  if( _difDsc.toOutputSS() ){
+    outputField2DEG(_SSDir.c_str(), "Ex-SS", Ex);
+    outputConcentration2DEG(_SSDir.c_str(), "conc-SS", se, sh);
+    outputFermiLevel2DEG(_SSDir.c_str(), "mu-SS");
+  }
 
   MPI_Barrier(MPI_COMM_WORLD);
 }

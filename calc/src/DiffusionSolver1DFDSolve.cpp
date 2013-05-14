@@ -28,14 +28,15 @@ double DiffusionSolver1DFD::solveStep(double t)
 
   RealSpaceGridHandler realSGH(getRealSGH());
   RealSpaceArrayDiffusion mue(realSGH), muh(realSGH);
-  const int size = mue.getSize(), lMax = 500;
+  const int size = mue.getSize(), lMax = 100;
   const double tol = 1e-7;
+  double err;
   int l;
 
   //cerr << "nonlinear iteration" << endl;
 
   for(l=1; l<=lMax; l++){
-    double err = 0.0;
+    err = 0.0;
 
     // For electrons.
 
@@ -61,17 +62,15 @@ double DiffusionSolver1DFD::solveStep(double t)
 
 
     // Convergence check.
-    /*
-    cerr << "l=" << l << endl;
-    cerr << "err=" << err << endl;
-    */
+
+    //cerr << "l=" << l << " err=" << err << endl;
+
     if( err < tol ) break;
   }
 
   if( l > lMax ){
     cerr << _className << "::solveStep: nonlinear iteration did not ";
-    cerr << "converge: t=" << t << endl;
-    exit(1);
+    cerr << "converge: t=" << t << " err=" << err << endl;
   }
 
 

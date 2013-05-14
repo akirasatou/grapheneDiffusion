@@ -1,6 +1,12 @@
 #!/bin/bash
 
-MAINDIR=../dat/timeDep/L=3000/Lg=1000/Vg=50
+# Definition of an internal function
+
+outputMu()
+{
+
+alpha=$1
+MAINDIR=../dat/alphaDep/alpha=${alpha}/Vg=50
 MUDIR=${MAINDIR}/mu
 
 OUTPUT=${MUDIR}/mu-e.dat
@@ -26,3 +32,12 @@ for file in `ls ${MUDIR}` ; do
 
     eval "awk '\$1==\"3.75e-06\" {print ${time} \" \" \$2}' ${MUDIR}/${file}" >> ${OUTPUT}
 done
+}
+
+
+# Main body.
+
+outputMu 1
+outputMu 2
+outputMu 5
+outputMu 10

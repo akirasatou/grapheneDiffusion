@@ -1,4 +1,4 @@
-exeFile=mainTimeDep
+exeFile=mainAlphaDep
 difFileNoExt=${exeFile}
 poiFileNoExt=${exeFile}
 difFile=${difFileNoExt}.dif
@@ -6,7 +6,7 @@ poiFile=${poiFileNoExt}.poi
 
 ~/lib/resutils/bin/geo2msh ${poiFileNoExt}
 
-alphaTab="2 20"
+alphaTab="1"
 
 for alpha in ${alphaTab};
 do

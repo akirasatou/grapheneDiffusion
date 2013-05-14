@@ -50,7 +50,7 @@ GrapheneTransportSolver1D(const PoissonSolver2DDescriptor &poiDsc,
   if( _difDsc.toOutputSS() ){
     _odm.push(string("SS")); _SSDir = _odm.pop();
   }
-  if( _difDsc.toOutputSS() ){
+  if( _difDsc.toOutputFermiLevel() ){
     _odm.push(string("mu")); _muDir = _odm.pop();
   }
   if( _difDsc.toOutputConcentration() ){

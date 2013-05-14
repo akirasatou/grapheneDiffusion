@@ -55,8 +55,10 @@ void GrapheneTransportSolver1D::_initPoissonSolver()
     _poisson.solve(t0, rho2D);
     _refineMesh();
     
-    sprintf(filehead, "phiInit-n=%d", 2*n);
-    outputPotential(_SSDir.c_str(), filehead, true);
+    if( _difDsc.toOutputSS() ){
+      sprintf(filehead, "phiInit-n=%d", 2*n);
+      outputPotential(_SSDir.c_str(), filehead, true);
+    }
 
     
     // Refinement using the second perturbed concentration.
@@ -74,8 +76,10 @@ void GrapheneTransportSolver1D::_initPoissonSolver()
     rho2D.updateInterpolator();
     _poisson.solve(t0, rho2D);
     _refineMesh();
-    
-    sprintf(filehead, "phiInit-n=%d", 2*n+1);
-    outputPotential(_SSDir.c_str(), filehead, true);
+
+    if( _difDsc.toOutputSS() ){
+      sprintf(filehead, "phiInit-n=%d", 2*n+1);
+      outputPotential(_SSDir.c_str(), filehead, true);
+    }
   }
 }
