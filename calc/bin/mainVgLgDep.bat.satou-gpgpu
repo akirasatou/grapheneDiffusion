@@ -1,0 +1,42 @@
+#!/bin/bash
+
+#PBS -e mainVgLgDep.err
+#PBS -o mainVgLgDep.out
+#PBS -q dque
+#PBS -l nodes=1:ppn=1
+cd $PBS_O_WORKDIR
+
+source /opt/intel/bin/compilervars.sh intel64
+source /opt/intel/bin/iccvars.sh intel64
+
+exeFile=mainVgLgDep
+difFileNoExt=${exeFile}
+poiFileNoExt=${exeFile}
+difFile=${difFileNoExt}.dif
+poiFile=${poiFileNoExt}.poi
+
+VgTab="5 10 15 20 25 30 35 40 45 50"
+LgTab="500 750 1250"
+L="3000"
+VgString="*(1-tanh((t+1e-18)\/1e-20))\/2"
+
+
+for Vg in ${VgTab}; do
+    for Lg in ${LgTab}; do
+
+    sed -e "s/Lg.*/Lg ${Lg}/" -e "s/bottomLg.*/bottomLg ${Lg}/" ${poiFile} > ${poiFile}.tmp
+    mv -f ${poiFile}.tmp ${poiFile}
+
+    sg=`expr \( ${L} - 2 \* ${Lg} \) / 2`
+
+    sed -e "s/sg.*/sg ${sg}/" -e "s/bottom_sg.*/bottom_sg ${sg}/" ${poiFile} > ${poiFile}.tmp
+    mv -f ${poiFile}.tmp ${poiFile}
+
+    sed -e "s/Vg.*/Vg ${Vg}${VgString} -${Vg}${VgString}/" -e "s/bottomVg.*/bottomVg ${Vg}${VgString} -${Vg}${VgString}/" ${poiFile} > ${poiFile}.tmp
+    mv -f ${poiFile}.tmp ${poiFile}
+ 
+    ~/lib/resutils/bin/geo2msh ${poiFileNoExt}
+
+    mpirun ./${exeFile} ${poiFileNoExt} ${difFileNoExt} -ksp_type preonly -pc_type lu -pc_factor_zeropivot 0
+    done
+done

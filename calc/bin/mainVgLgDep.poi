@@ -13,20 +13,20 @@ LeftRightBoundary {
 
 Gate {
   Ng 2
-  Vg 20*(1-tanh((t+1e-18)/1e-20))/2 -20*(1-tanh((t+1e-18)/1e-20))/2
-  Lg 1000
+  Vg 50*(1-tanh((t+1e-18)/1e-20))/2 -50*(1-tanh((t+1e-18)/1e-20))/2
+  Lg 1250
   Wg 1000
   tg 10
-  sg 500
+  sg 250
 }
 
 BottomGate {
   bottomNg 2
-  bottomVg 20*(1-tanh((t+1e-18)/1e-20))/2 -20*(1-tanh((t+1e-18)/1e-20))/2
-  bottomLg 1000
+  bottomVg 50*(1-tanh((t+1e-18)/1e-20))/2 -50*(1-tanh((t+1e-18)/1e-20))/2
+  bottomLg 1250
   bottomWg 1000
   bottom_tg 10
-  bottom_sg 500
+  bottom_sg 250
 }
 
 LowerBoundary {
