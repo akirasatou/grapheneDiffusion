@@ -6,37 +6,25 @@ outputMuVgDep()
 {
 
 Lg=$1
-MAINDIR=../dat/VgLgDep/L=3000/Lg=${Lg}/Vg=50
-MUDIR=${MAINDIR}/mu
+MAINDIR=../dat/VgLgDep/L=3000
+OUTPUT=${MAINDIR}/mue-Lg=${Lg}.dat
 
-OUTPUT=${MUDIR}/mu-e.dat
+MAINDIR=${MAINDIR}/Lg=${Lg}
 
 if ( test -e ${OUTPUT} ); then
     rm -f ${OUTPUT}
 fi
 
-timemax=100000
-
-for file in `ls ${MUDIR}` ; do
-    suf=`echo ${file} | cut -d "-" -f 4 | sed -e "s/.dat$//g"`
-
-    if [ "${suf}" != "e" ]; then
-	continue
-    fi
-
-    time=`echo ${file} | cut -d "-" -f 3 | sed -e "s/t=//g" | sed -e "s/fs$//g"`
-
-    if [ `echo "${time} <= ${timemax}" | bc` -eq 0 ]; then
-	break
-    fi
-
-    eval "awk '\$1==\"3.75e-06\" {print ${time} \" \" \$2}' ${MUDIR}/${file}" >> ${OUTPUT}
+for Vg in 5 10 15 20 25 30 35 40 45 50; do
+    MUDIR=${MAINDIR}/Vg=${Vg}/mu
+    file=`ls ${MUDIR} | tail -2 | head -1`
+    eval "awk 'NR==1 {print ${Vg} \" \" \$2}' ${MUDIR}/${file}" >> ${OUTPUT}
 done
 }
 
 
 # Main body.
 
-for Lg in "500 750 1000 1250"; do
+for Lg in 500 750 1000 1250; do
     outputMuVgDep ${Lg}
 done

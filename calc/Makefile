@@ -34,6 +34,9 @@ mainAlphaDep:  ${OBJS_WOMAIN} bin/mainAlphaDep.o
 mainVgLgDep:  ${OBJS_WOMAIN} bin/mainVgLgDep.o
 	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
 
+mainVgLgDep-appr:  ${OBJS_WOMAIN} bin/mainVgLgDep-appr.o
+	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
+
 testTR:  ${OBJS_WOMAIN} bin/testTR.o
 	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
 
