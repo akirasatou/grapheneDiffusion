@@ -11,12 +11,12 @@ source /opt/intel/bin/iccvars.sh intel64
 
 exeFile=mainVgLgDep
 difFileNoExt=${exeFile}
-poiFileNoExt=${exeFile}
+poiFileNoExt=${exeFile}-2
 difFile=${difFileNoExt}.dif
 poiFile=${poiFileNoExt}.poi
 
-VgTab="100 105"
-LgTab="500"
+VgTab="90 120"
+LgTab="750"
 L="3000"
 VgString="*(1-tanh((t+1e-18)\/1e-20))\/2"
 
