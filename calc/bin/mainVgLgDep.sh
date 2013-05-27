@@ -15,7 +15,7 @@ if ( test -e ${OUTPUT} ); then
     rm -f ${OUTPUT}
 fi
 
-for Vg in $(seq 5 5 100); do
+for Vg in $(seq 5 5 150); do
     MUDIR=${MAINDIR}/Vg=${Vg}/mu
     file=`ls ${MUDIR} | tail -2 | head -1`
     eval "awk 'NR==1 {print ${Vg} \" \" \$2}' ${MUDIR}/${file}" >> ${OUTPUT}
