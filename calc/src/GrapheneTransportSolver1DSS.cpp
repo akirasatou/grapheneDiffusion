@@ -63,6 +63,10 @@ void GrapheneTransportSolver1D::_setInitialSteadyStateSCF()
     _muHole.setAt(i, -E);
   }
 
+  if( _difDsc.toOutputSS() ){
+    outputPotential(_SSDir.c_str(), "pot-SS", true);
+  }
+
 
   // Solve the linear Poisson once to have the initial solution vector
   // for the nonlinear Poisson. The time is slightly shifted from 0
