@@ -17,8 +17,9 @@ fi
 
 for Vg in $(seq 5 5 150); do
     MUDIR=${MAINDIR}/Vg=${Vg}/mu
-    file=`ls ${MUDIR} | tail -2 | head -1`
-    eval "awk 'NR==1 {print ${Vg} \" \" \$2}' ${MUDIR}/${file}" >> ${OUTPUT}
+
+    time0=300
+    echo ${Vg} `./findMinMuAt ${MUDIR} ${time0} e` >> ${OUTPUT}
 done
 }
 
