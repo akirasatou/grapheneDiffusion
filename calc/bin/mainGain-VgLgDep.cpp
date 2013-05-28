@@ -19,13 +19,16 @@ double calc_gw(double f, double d, double epsilon, double mu,
   double wd_c = w*d/c;
   double kwd = sqrt(epsilon*wd_c*wd_c-pi*pi/4.0);
 
+  printf("%g\n", kwd);
+
   return -2*pi/kwd*(wd_c)*(sigma_inter(hbar*w/2, mu, T)/c)/d;
 }
 
 int main()
 {
   const double LgTab[4] = {nm2m(1250), nm2m(1000), nm2m(750), nm2m(500)};
-  const double f = THz2Hz(37.5), d = nm2m(1000), epsilon = 4, T = 300;
+  //const double f = THz2Hz(37.5), d = nm2m(1000), epsilon = 4, T = 300;
+  const double f = c/micro2m(8), d = nm2m(1000), epsilon = 4, T = 300;
 
   for(int i=0; i<4; i++){
     double Lg = LgTab[i];
