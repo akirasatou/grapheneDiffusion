@@ -9,7 +9,7 @@ Simulation {
   Lc 3000
   T 300
   alpha 10
-  tMax 0.00001
+  tMax 500
 }
 
 Output {

@@ -1,7 +1,7 @@
 Interior {
   L 3000
-  Wu1 2000
-  Wd1 2000
+  Wu1 2500
+  Wd1 2500
   epsilon_u1 4
   epsilon_d1 4
 }
@@ -13,18 +13,18 @@ LeftRightBoundary {
 
 Gate {
   Ng 2
-  Vg 100*(1-tanh((t+1e-18)/1e-20))/2 -100*(1-tanh((t+1e-18)/1e-20))/2
+  Vg 50*(1-tanh((t+1e-18)/1e-20))/2 -50*(1-tanh((t+1e-18)/1e-20))/2
   Lg 1000
-  Wg 1000
+  Wg 1500
   tg 10
   sg 500
 }
 
 BottomGate {
   bottomNg 2
-  bottomVg 100*(1-tanh((t+1e-18)/1e-20))/2 -100*(1-tanh((t+1e-18)/1e-20))/2
+  bottomVg 50*(1-tanh((t+1e-18)/1e-20))/2 -50*(1-tanh((t+1e-18)/1e-20))/2
   bottomLg 1000
-  bottomWg 1000
+  bottomWg 1500
   bottom_tg 10
   bottom_sg 500
 }

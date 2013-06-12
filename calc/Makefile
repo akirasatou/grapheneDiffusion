@@ -34,7 +34,13 @@ mainAlphaDep:  ${OBJS_WOMAIN} bin/mainAlphaDep.o
 mainVgLgDep:  ${OBJS_WOMAIN} bin/mainVgLgDep.o
 	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
 
+mainVgWgDep:  ${OBJS_WOMAIN} bin/mainVgWgDep.o
+	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
+
 mainVgLgDep-appr:  ${OBJS_WOMAIN} bin/mainVgLgDep-appr.o
+	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
+
+mainGain-VgLgDep:  ${OBJS_WOMAIN} bin/mainGain-VgLgDep.o
 	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
 
 testTR:  ${OBJS_WOMAIN} bin/testTR.o

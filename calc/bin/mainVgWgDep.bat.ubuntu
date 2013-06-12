@@ -1,26 +1,27 @@
 #!/bin/bash
 
-exeFile=mainVgLgDep
+exeFile=mainVgWgDep
 difFileNoExt=${exeFile}
 poiFileNoExt=${exeFile}
 difFile=${difFileNoExt}.dif
 poiFile=${poiFileNoExt}.poi
 
-VgTab="100"
-LgTab="1000"
+VgTab="10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200"
+WgTab="1500"
 L="3000"
 VgString="*(1-tanh((t+1e-18)\/1e-20))\/2"
 
 
 for Vg in ${VgTab}; do
-    for Lg in ${LgTab}; do
+    for Wg in ${WgTab}; do
 
-    sed -e "s/Lg.*/Lg ${Lg}/" -e "s/bottomLg.*/bottomLg ${Lg}/" ${poiFile} > ${poiFile}.tmp
+    Wu1=`expr ${Wg} + 1000`
+    Wd1=`expr ${Wg} + 1000`
+
+    sed -e "s/Wg.*/Wg ${Wg}/" -e "s/bottomWg.*/bottomWg ${Wg}/" ${poiFile} > ${poiFile}.tmp
     mv -f ${poiFile}.tmp ${poiFile}
 
-    sg=`expr \( ${L} - 2 \* ${Lg} \) / 2`
-
-    sed -e "s/sg.*/sg ${sg}/" -e "s/bottom_sg.*/bottom_sg ${sg}/" ${poiFile} > ${poiFile}.tmp
+    sed -e "s/Wu1.*/Wu1 ${Wu1}/" -e "s/Wd1.*/Wd1 ${Wd1}/" ${poiFile} > ${poiFile}.tmp
     mv -f ${poiFile}.tmp ${poiFile}
 
     sed -e "s/Vg.*/Vg ${Vg}${VgString} -${Vg}${VgString}/" -e "s/bottomVg.*/bottomVg ${Vg}${VgString} -${Vg}${VgString}/" ${poiFile} > ${poiFile}.tmp

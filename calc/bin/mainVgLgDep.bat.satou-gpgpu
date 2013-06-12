@@ -15,8 +15,8 @@ poiFileNoExt=${exeFile}
 difFile=${difFileNoExt}.dif
 poiFile=${poiFileNoExt}.poi
 
-VgTab="100 105"
-LgTab="500"
+VgTab="25 50 75 100"
+LgTab="1000"
 L="3000"
 VgString="*(1-tanh((t+1e-18)\/1e-20))\/2"
 
