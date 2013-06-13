@@ -6,10 +6,10 @@ Mesh {
 
 Simulation {
   Sigma0 0.0
-  Lc 4500
+  Lc 3000
   T 300
   alpha 10
-  tMax 351
+  tMax 500
 }
 
 Output {

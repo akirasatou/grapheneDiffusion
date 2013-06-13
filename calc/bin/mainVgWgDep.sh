@@ -15,7 +15,7 @@ if ( test -e ${OUTPUT} ); then
     rm -f ${OUTPUT}
 fi
 
-for Vg in $(seq 10 10 200); do
+for Vg in $(seq 10 10 230); do
     MUDIR=${MAINDIR}/Vg=${Vg}/mu
 
     time0=300

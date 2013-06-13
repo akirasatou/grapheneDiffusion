@@ -1,0 +1,21 @@
+#!/bin/bash
+
+exeFile=mainVgDep-grounded
+difFileNoExt=${exeFile}
+poiFileNoExt=${exeFile}
+difFile=${difFileNoExt}.dif
+poiFile=${poiFileNoExt}.poi
+
+VgTab="400"
+VgString="*(1-tanh((t+1e-18)\/1e-20))\/2"
+
+
+for Vg in ${VgTab}; do
+
+    sed -e "s/Vg.*/Vg ${Vg}${VgString} -${Vg}${VgString}/" -e "s/bottomVg.*/bottomVg ${Vg}${VgString} -${Vg}${VgString}/" ${poiFile} > ${poiFile}.tmp
+    mv -f ${poiFile}.tmp ${poiFile}
+ 
+    ~/lib/resutils/bin/geo2msh ${poiFileNoExt}
+
+    mpirun.mpich2 -np 1 ./${exeFile} ${poiFileNoExt} ${difFileNoExt} -ksp_type preonly -pc_type lu -pc_factor_zeropivot 0
+done

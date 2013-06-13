@@ -37,10 +37,16 @@ mainVgLgDep:  ${OBJS_WOMAIN} bin/mainVgLgDep.o
 mainVgWgDep:  ${OBJS_WOMAIN} bin/mainVgWgDep.o
 	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
 
+mainVgDep-grounded:  ${OBJS_WOMAIN} bin/mainVgDep-grounded.o
+	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
+
 mainVgLgDep-appr:  ${OBJS_WOMAIN} bin/mainVgLgDep-appr.o
 	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
 
 mainGain-VgLgDep:  ${OBJS_WOMAIN} bin/mainGain-VgLgDep.o
+	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
+
+mainGain-VgWgDep:  ${OBJS_WOMAIN} bin/mainGain-VgWgDep.o
 	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
 
 testTR:  ${OBJS_WOMAIN} bin/testTR.o
