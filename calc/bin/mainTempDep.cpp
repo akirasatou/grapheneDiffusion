@@ -58,12 +58,16 @@ int main(int argc, char *argv[])
 
   // Create parent directories for output.
 
-  OutputDirectoryManager odm("../dat/VgDep-grounded");
+  OutputDirectoryManager odm("../dat");
 
-  odm.push(ValueStringGenerator("Lg", "default").getValueString(m2nm(poiDsc.getGates()[0]->getLg())));
-
+  odm.push(ValueStringGenerator("T", "default").getValueString(difDsc.getT()));
+  /*
+  odm.push("alphaDep");
+  odm.push(ValueStringGenerator("alpha", "default").getValueString(difDsc.get_alpha()));
+  */
+  odm.push("VgDep");
   odm.push(ValueStringGenerator("Vg", "default").getValueString(poiDsc.getGates()[0]->getVoltage(-fs2s(100))));
-
+  
 
   // Initialize the solver.
 

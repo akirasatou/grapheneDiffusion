@@ -31,13 +31,13 @@ Complex calc_kw(double f, double d, double epsilon, double mu,
 
 int main()
 {
-  const double WgTab[2] = {nm2m(1500), nm2m(2000)};
+  const double LgTab[3] = {nm2m(300), nm2m(450), nm2m(600)};
   //const double f = THz2Hz(37.5), d = nm2m(1000), epsilon = 4, T = 300;
   const double epsilon = 4, T = 300;
 
-  for(int i=0; i<2; i++){
-    double Wg = WgTab[i];
-    double L = 3*Wg;
+  for(int i=0; i<3; i++){
+    double Lg = LgTab[i];
+    double Wg = 10*Lg/3;
 
     for(int j=80; j<=160; j+=10){
       FILE *fin, *fre, *fim;
@@ -45,16 +45,16 @@ int main()
       double lambda = micro2m(j/10.0);
       double f = c/lambda;
       
-      sprintf(filename, "../dat/VgWgDep/L=%g/mue-Wg=%g.dat",
-	      m2nm(L), m2nm(Wg));
+      sprintf(filename, "../dat/VgDep-grounded/mue-Lg=%g.dat",
+	      m2nm(Lg));
       fin = fopen(filename, "r");
 
-      sprintf(filename, "../dat/VgWgDep/L=%g/kw-Wg=%g-lambda=%g.dat",
-	      m2nm(L), m2nm(Wg), m2micro(lambda));
+      sprintf(filename, "../dat/VgDep-grounded/kw-Lg=%g-lambda=%g.dat",
+	      m2nm(Lg), m2micro(lambda));
       fre = fopen(filename, "w");
 
-      sprintf(filename, "../dat/VgWgDep/L=%g/gw-Wg=%g-lambda=%g.dat",
-	      m2nm(L), m2nm(Wg), m2micro(lambda));
+      sprintf(filename, "../dat/VgDep-grounded/gw-Lg=%g-lambda=%g.dat",
+	      m2nm(Lg), m2micro(lambda));
       fim = fopen(filename, "w");
 
       while( true ){

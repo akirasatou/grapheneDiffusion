@@ -6,10 +6,10 @@ Mesh {
 
 Simulation {
   Sigma0 0.0
-  Lc 3000
+  Lc 6000
   T 300
   alpha 10
-  tMax 500
+  tMax 351
 }
 
 Output {
@@ -19,4 +19,4 @@ Output {
   toOutputConcentration false
   toOutputFermiLevel true
   toOutputField false
-}
+\}

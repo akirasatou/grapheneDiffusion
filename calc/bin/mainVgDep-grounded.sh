@@ -5,18 +5,17 @@
 outputMuVgDep()
 {
 
-Wg=$1
-L=`expr ${Wg} \* 3`
-MAINDIR=../dat/VgWgDep/L=${L}
-OUTPUT=${MAINDIR}/mue-Wg=${Wg}.dat
+Lg=$1
+MAINDIR=../dat/VgDep-grounded/
+OUTPUT=${MAINDIR}/mue-Lg=${Lg}.dat
 
-MAINDIR=${MAINDIR}/Wg=${Wg}
+MAINDIR=${MAINDIR}/Lg=${Lg}
 
 if ( test -e ${OUTPUT} ); then
     rm -f ${OUTPUT}
 fi
 
-for Vg in $(seq 10 10 150); do
+for Vg in $(seq 50 50 400); do
     MUDIR=${MAINDIR}/Vg=${Vg}/mu
 
     time0=300
@@ -27,6 +26,7 @@ done
 
 # Main body.
 
-for Wg in 1500 2000; do
-    outputMuVgDep ${Wg}
+
+for Lg in 300 450 600; do
+    outputMuVgDep ${Lg}
 done

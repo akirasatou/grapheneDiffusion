@@ -40,6 +40,9 @@ mainVgWgDep:  ${OBJS_WOMAIN} bin/mainVgWgDep.o
 mainVgDep-grounded:  ${OBJS_WOMAIN} bin/mainVgDep-grounded.o
 	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
 
+mainTempDep:  ${OBJS_WOMAIN} bin/mainTempDep.o
+	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
+
 mainVgLgDep-appr:  ${OBJS_WOMAIN} bin/mainVgLgDep-appr.o
 	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
 
@@ -47,6 +50,9 @@ mainGain-VgLgDep:  ${OBJS_WOMAIN} bin/mainGain-VgLgDep.o
 	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
 
 mainGain-VgWgDep:  ${OBJS_WOMAIN} bin/mainGain-VgWgDep.o
+	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
+
+mainGain-VgDep-grounded:  ${OBJS_WOMAIN} bin/mainGain-VgDep-grounded.o
 	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
 
 testTR:  ${OBJS_WOMAIN} bin/testTR.o
