@@ -1,0 +1,19 @@
+#!/bin/bash
+
+exeFile=mainAlphaDep-grounded
+difFileNoExt=${exeFile}
+poiFileNoExt=${exeFile}
+difFile=${difFileNoExt}.dif
+poiFile=${poiFileNoExt}.poi
+
+~/lib/resutils/bin/geo2msh ${poiFileNoExt}
+
+alphaTab="5 10"
+
+for alpha in ${alphaTab};
+do
+    sed -e "s/alpha.*/alpha ${alpha}/" ${difFile} > ${difFile}.tmp
+    mv -f ${difFile}.tmp ${difFile}
+
+    mpirun.mpich2 -np 1 ./${exeFile} ${poiFileNoExt} ${difFileNoExt} -ksp_type preonly -pc_type lu -pc_factor_zeropivot 0
+done

@@ -40,6 +40,12 @@ mainVgWgDep:  ${OBJS_WOMAIN} bin/mainVgWgDep.o
 mainVgDep-grounded:  ${OBJS_WOMAIN} bin/mainVgDep-grounded.o
 	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
 
+mainTimeDep-grounded:  ${OBJS_WOMAIN} bin/mainTimeDep-grounded.o
+	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
+
+mainAlphaDep-grounded:  ${OBJS_WOMAIN} bin/mainAlphaDep-grounded.o
+	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
+
 mainTempDep:  ${OBJS_WOMAIN} bin/mainTempDep.o
 	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
 

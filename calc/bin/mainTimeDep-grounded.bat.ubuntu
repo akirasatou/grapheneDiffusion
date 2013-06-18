@@ -1,0 +1,11 @@
+#!/bin/bash
+
+exeFile=mainTimeDep-grounded
+difFileNoExt=${exeFile}
+poiFileNoExt=${exeFile}
+difFile=${difFileNoExt}.dif
+poiFile=${poiFileNoExt}.poi
+
+~/lib/resutils/bin/geo2msh ${poiFileNoExt}
+
+mpirun.mpich2 -np 1 ./${exeFile} ${poiFileNoExt} ${difFileNoExt} -ksp_type preonly -pc_type lu -pc_factor_zeropivot 0

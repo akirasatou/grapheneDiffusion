@@ -30,7 +30,7 @@ void GrapheneTransportSolver1D::_initPoissonSolver()
   // !Do not set too high concentration because it induces large
   // numerical errors when calculating with the real distribution.!
 
-  const int nr = 2;
+  const int nr = 4;
   const double dsAmp = 0.1;
   const double SigmaArt = 1e16;
 

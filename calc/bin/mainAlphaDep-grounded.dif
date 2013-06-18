@@ -1,6 +1,6 @@
 Mesh {
   Nx 300
-  dmuMax 0.05
+  dmuMax 0.1
   dtMax 1
 }
 
@@ -8,8 +8,8 @@ Simulation {
   Sigma0 0.0
   Lc 3000
   T 300
-  alpha 10
-  tMax 0
+  alpha 5
+  tMax 10051
 }
 
 Output {
@@ -17,6 +17,6 @@ Output {
   nOutputBinStep 100000
   toOutputSS true
   toOutputConcentration false
-  toOutputFermiLevel false
+  toOutputFermiLevel true
   toOutputField false
 }
