@@ -8,7 +8,7 @@ Simulation {
   Sigma0 0.0
   Lc 3000
   T 300
-  alpha 5
+  alpha 10
   tMax 10051
 }
 

@@ -1,6 +1,6 @@
 Mesh {
   Nx 300
-  dmuMax 0.1
+  dmuMax 0.05
   dtMax 1
 }
 
