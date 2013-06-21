@@ -1,0 +1,25 @@
+#!/bin/bash
+
+WgTab="1420 1440 1460 1480 1500 1520 1540 1560 1580"
+
+for Vg in $(seq 10 10 400); do
+    for Wg in ${WgTab}; do
+	Lg=`expr ${Wg} \* 3 / 10`
+
+	batFile="mainVgWgLgDep-grounded-Vg=${Vg}-Wg=${Wg}-Lg=${Lg}.bat"
+	cp -f mainVgWgLgDep-grounded.bat.satou-gpgpu ${batFile}
+
+	sed -e "s/VgDummy/${Vg}/" ${batFile} > ${batFile}.tmp
+	mv -f ${batFile}.tmp ${batFile}
+
+	sed -e "s/WgDummy/${Wg}/" ${batFile} > ${batFile}.tmp
+	mv -f ${batFile}.tmp ${batFile}
+
+	sed -e "s/LgDummy/${Lg}/" ${batFile} > ${batFile}.tmp
+	mv -f ${batFile}.tmp ${batFile}
+
+	qsub ${batFile}
+
+	rm -f ${batFile}
+    done
+done

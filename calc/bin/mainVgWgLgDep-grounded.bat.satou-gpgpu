@@ -1,0 +1,78 @@
+#!/bin/bash
+
+#PBS -e mainVgWgLgDep-grounded.err
+#PBS -o mainVgWgLgDep-grounded.out
+#PBS -q dque
+#PBS -l nodes=1:ppn=1
+cd $PBS_O_WORKDIR
+
+source /opt/intel/bin/compilervars.sh intel64
+source /opt/intel/bin/iccvars.sh intel64
+
+
+# extraction of parameters.
+
+Vg=VgDummy
+Wg=WgDummy
+Lg=LgDummy
+L=`expr ${Wg} \* 3`
+VgString="*(1-tanh((t+1e-18)\/1e-20))\/2"
+
+Wu1=`expr ${Wg} \* 2`
+Wd1=${Wg}
+
+
+# generate dif and poi files.
+
+exeFile=mainVgWgLgDep-grounded
+difOrgFileNoExt=${exeFile}
+poiOrgFileNoExt=${exeFile}
+difOrgFile=${difOrgFileNoExt}.dif
+poiOrgFile=${poiOrgFileNoExt}.poi
+difNewFileNoExt="${exeFile}-Vg=${Vg}-Wg=${Wg}-Lg=${Lg}.dif"
+poiNewFileNoExt="${exeFile}-Vg=${Vg}-Wg=${Wg}-Lg=${Lg}.poi"
+difNewFile=${difNewFileNoExt}.dif
+poiNewFile=${poiNewFileNoExt}.poi
+
+
+# put parameters in new files.
+
+cp -f ${poiOrgFile} ${poiNewFile}
+cp -f ${difOrgFile} ${difNewFile}
+
+sed -e "s/Lc.*/Lc ${L}/" ${difNewFile} > ${difNewFile}.tmp
+mv -f ${difNewFile}.tmp ${difNewFile}
+
+sed -e "s/L .*/L ${L}/" ${poiNewFile} > ${poiNewFile}.tmp
+mv -f ${poiNewFile}.tmp ${poiNewFile}
+
+sed -e "s/Wg.*/Wg ${Wg}/" ${poiNewFile} > ${poiNewFile}.tmp
+mv -f ${poiNewFile}.tmp ${poiNewFile}
+
+sed -e "s/Wu1.*/Wu1 ${Wu1}/" -e "s/Wd1.*/Wd1 ${Wd1}/" ${poiNewFile} > ${poiNewFile}.tmp
+mv -f ${poiNewFile}.tmp ${poiNewFile}
+
+sed -e "s/Lg.*/Lg ${Lg}/" -e "s/bottomLg.*/bottomLg ${Lg}/" ${poiNewFile} > ${poiNewFile}.tmp
+mv -f ${poiNewFile}.tmp ${poiNewFile}
+
+sg=`expr \( ${L} - 2 \* ${Lg} \) / 2`
+
+sed -e "s/sg.*/sg ${sg}/" ${poiNewFile} > ${poiNewFile}.tmp
+mv -f ${poiNewFile}.tmp ${poiNewFile}
+
+sed -e "s/Vg.*/Vg ${Vg}${VgString} -${Vg}${VgString}/" ${poiNewFile} > ${poiNewFile}.tmp
+mv -f ${poiNewFile}.tmp ${poiNewFile}
+
+
+# generate mesh and run.
+
+~/lib/resutils/bin/geo2msh ${poiNewFileNoExt}
+
+mpirun ./${exeFile} ${poiNewFileNoExt} ${difNewFileNoExt} -ksp_type preonly -pc_type lu -pc_factor_zeropivot 0
+
+
+# delete new files.
+
+rm -f ${poiNewFile}
+rm -f ${difNewFile}
+rm -f ${poiNewFileNoExt}.msh

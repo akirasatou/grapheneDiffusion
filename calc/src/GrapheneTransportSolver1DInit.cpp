@@ -31,7 +31,7 @@ void GrapheneTransportSolver1D::_initPoissonSolver()
   // numerical errors when calculating with the real distribution.!
 
   //const int nr = 4;
-  const int nr = 2;
+  const int nr = 3;
   const double dsAmp = 0.1;
   const double SigmaArt = 1e16;
 

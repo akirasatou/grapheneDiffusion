@@ -22,6 +22,9 @@ TARGETS = ${patsubst bin/%.cpp, %, ${SRCS_MAIN}}
 %.o : %.cpp
 	${CXX} ${CXXFLAGS} -c $< -o $@
 
+findMinMuAt:  ${OBJS_WOMAIN} bin/findMinMuAt.o
+	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
+
 main:  ${OBJS_WOMAIN} bin/main.o
 	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
 
@@ -44,6 +47,15 @@ mainTimeDep-grounded:  ${OBJS_WOMAIN} bin/mainTimeDep-grounded.o
 	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
 
 mainAlphaDep-grounded:  ${OBJS_WOMAIN} bin/mainAlphaDep-grounded.o
+	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
+
+mainVgWgLgDep-grounded:  ${OBJS_WOMAIN} bin/mainVgWgLgDep-grounded.o
+	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
+
+mainGain-VgWgLgDep-grounded:  ${OBJS_WOMAIN} bin/mainGain-VgWgLgDep-grounded.o
+	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
+
+mainGain:  ${OBJS_WOMAIN} bin/mainGain.o
 	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
 
 mainTempDep:  ${OBJS_WOMAIN} bin/mainTempDep.o

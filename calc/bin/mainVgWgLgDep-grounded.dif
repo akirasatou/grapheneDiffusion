@@ -9,7 +9,7 @@ Simulation {
   Lc 3000
   T 300
   alpha 10
-  tMax 0
+  tMax 351
 }
 
 Output {
@@ -17,6 +17,6 @@ Output {
   nOutputBinStep 100000
   toOutputSS true
   toOutputConcentration false
-  toOutputFermiLevel false
+  toOutputFermiLevel true
   toOutputField false
 }
