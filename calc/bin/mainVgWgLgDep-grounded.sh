@@ -7,10 +7,11 @@ outputMuVgWgLgDep()
 
 Wg=$1
 Lg=$2
+L=$3
 MAINDIR=../dat/VgWgLgDep-grounded/
-OUTPUT=${MAINDIR}/mue-Wg=${Wg}-Lg=${Lg}.dat
+OUTPUT=${MAINDIR}/Wg=${Wg}/mue-L=${L}-Lg=${Lg}.dat
 
-MAINDIR=${MAINDIR}/Wg=${Wg}/Lg=${Lg}
+MAINDIR=${MAINDIR}/Wg=${Wg}/L=${L}/Lg=${Lg}
 
 if ( test -e ${OUTPUT} ); then
     rm -f ${OUTPUT}
@@ -27,10 +28,17 @@ done
 
 # Main body.
 
-WgTab="1200 1400 1600 1800"
+Wg="1500"
+#LTab="4000 6000 8000"
+#LLgTab="4 5 8 10 16 20"
+LTab="8000"
+LLgTab="40"
 
-for Wg in $(seq 1420 20 1580); do
-    Lg=`expr ${Wg} \* 3 / 10`
-
-    outputMuVgWgLgDep ${Wg} ${Lg}
+for L in ${LTab}; do
+    for LLg in ${LLgTab}; do
+	
+	Lg=`expr ${L} / ${LLg}`
+	
+	outputMuVgWgLgDep ${Wg} ${Lg} ${L}
+    done
 done

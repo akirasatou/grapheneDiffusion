@@ -1,25 +1,37 @@
 #!/bin/bash
 
-WgTab="1420 1440 1460 1480 1500 1520 1540 1560 1580"
+#WgTab="1420 1440 1460 1480 1500 1520 1540 1560 1580"
+Wg="1500"
+#LTab="4000 6000 8000"
+#LLgTab="4 5 8 10 16 20"
+
+LTab="8000"
+LLgTab="40"
 
 for Vg in $(seq 10 10 400); do
-    for Wg in ${WgTab}; do
-	Lg=`expr ${Wg} \* 3 / 10`
+    for L in ${LTab}; do
+	for LLg in ${LLgTab}; do
 
-	batFile="mainVgWgLgDep-grounded-Vg=${Vg}-Wg=${Wg}-Lg=${Lg}.bat"
-	cp -f mainVgWgLgDep-grounded.bat.satou-gpgpu ${batFile}
+	    Lg=`expr ${L} / ${LLg}`
 
-	sed -e "s/VgDummy/${Vg}/" ${batFile} > ${batFile}.tmp
-	mv -f ${batFile}.tmp ${batFile}
+	    batFile="mainVgWgLgDep-grounded-Vg=${Vg}-Wg=${Wg}-Lg=${Lg}-L=${L}.bat"
+	    cp -f mainVgWgLgDep-grounded.bat.satou-gpgpu ${batFile}
 
-	sed -e "s/WgDummy/${Wg}/" ${batFile} > ${batFile}.tmp
-	mv -f ${batFile}.tmp ${batFile}
+	    sed -e "s/VgDummy/${Vg}/" ${batFile} > ${batFile}.tmp
+	    mv -f ${batFile}.tmp ${batFile}
+	    
+	    sed -e "s/WgDummy/${Wg}/" ${batFile} > ${batFile}.tmp
+	    mv -f ${batFile}.tmp ${batFile}
+	    
+	    sed -e "s/LgDummy/${Lg}/" ${batFile} > ${batFile}.tmp
+	    mv -f ${batFile}.tmp ${batFile}
+	    
+	    sed -e "s/LDummy/${L}/" ${batFile} > ${batFile}.tmp
+	    mv -f ${batFile}.tmp ${batFile}
 
-	sed -e "s/LgDummy/${Lg}/" ${batFile} > ${batFile}.tmp
-	mv -f ${batFile}.tmp ${batFile}
+	    qsub ${batFile}
 
-	qsub ${batFile}
-
-	rm -f ${batFile}
+	    rm -f ${batFile}
+	done
     done
 done

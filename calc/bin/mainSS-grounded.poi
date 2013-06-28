@@ -13,7 +13,7 @@ LeftRightBoundary {
 
 Gate {
   Ng 2
-  Vg 200*(1-tanh((t+1e-18)/1e-20))/2 -200*(1-tanh((t+1e-18)/1e-20))/2
+  Vg 400*(1-tanh((t+1e-18)/1e-20))/2 -400*(1-tanh((t+1e-18)/1e-20))/2
   Lg 500
   Wg 1500
   tg 10

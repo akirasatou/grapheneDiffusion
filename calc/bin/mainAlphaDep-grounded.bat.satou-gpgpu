@@ -1,0 +1,51 @@
+#!/bin/bash
+
+#PBS -e mainAlphaDep-grounded.err
+#PBS -o mainAlphaDep-grounded.out
+#PBS -q dque
+#PBS -l nodes=1:ppn=1
+cd $PBS_O_WORKDIR
+
+source /opt/intel/bin/compilervars.sh intel64
+source /opt/intel/bin/iccvars.sh intel64
+
+
+# extraction of parameters.
+
+alpha=alphaDummy
+
+
+# generate dif and poi files.
+
+exeFile=mainAlphaDep-grounded
+difOrgFileNoExt=${exeFile}
+poiOrgFileNoExt=${exeFile}
+difOrgFile=${difOrgFileNoExt}.dif
+poiOrgFile=${poiOrgFileNoExt}.poi
+difNewFileNoExt="${exeFile}-alpha=${alpha}.dif"
+poiNewFileNoExt="${exeFile}-alpha=${alpha}.poi"
+difNewFile=${difNewFileNoExt}.dif
+poiNewFile=${poiNewFileNoExt}.poi
+
+
+# put parameters in new files.
+
+cp -f ${poiOrgFile} ${poiNewFile}
+cp -f ${difOrgFile} ${difNewFile}
+
+sed -e "s/alpha.*/alpha ${alpha}/" ${difNewFile} > ${difNewFile}.tmp
+mv -f ${difNewFile}.tmp ${difNewFile}
+
+
+# generate mesh and run.
+
+~/lib/resutils/bin/geo2msh ${poiNewFileNoExt}
+
+mpirun ./${exeFile} ${poiNewFileNoExt} ${difNewFileNoExt} -ksp_type preonly -pc_type lu -pc_factor_zeropivot 0
+
+
+# delete new files.
+
+rm -f ${poiNewFile}
+rm -f ${difNewFile}
+rm -f ${poiNewFileNoExt}.msh

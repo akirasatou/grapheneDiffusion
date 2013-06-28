@@ -58,11 +58,8 @@ int main(int argc, char *argv[])
 
   // Create parent directories for output.
 
-  OutputDirectoryManager odm("../dat/VgWgLgDep-grounded");
+  OutputDirectoryManager odm("../dat/SS-grounded");
 
-  odm.push(ValueStringGenerator("Wg", "default").getValueString(m2nm(poiDsc.getWg())));
-  odm.push(ValueStringGenerator("L", "default").getValueString(m2nm(poiDsc.getL())));
-  odm.push(ValueStringGenerator("Lg", "default").getValueString(m2nm(poiDsc.getGates()[0]->getLg())));
   odm.push(ValueStringGenerator("Vg", "default").getValueString(poiDsc.getGates()[0]->getVoltage(-fs2s(100))));
 
 

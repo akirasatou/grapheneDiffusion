@@ -1,12 +1,12 @@
 Mesh {
   Nx 300
-  dmuMax 0.1
+  dmuMax 0.05
   dtMax 1
 }
 
 Simulation {
   Sigma0 0.0
-  Lc 3000
+  Lc 4000
   T 300
   alpha 2
   tMax 10051

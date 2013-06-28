@@ -1,0 +1,12 @@
+#!/bin/bash
+
+for Vg in $(seq 100 100 400); do
+    
+    batFile="mainSS-grounded-Vg=${Vg}.bat"
+    cp -f mainSS-grounded.bat.satou-gpgpu ${batFile}
+    
+    sed -e "s/VgDummy/${Vg}/" ${batFile} > ${batFile}.tmp
+    mv -f ${batFile}.tmp ${batFile}
+    qsub ${batFile}
+    rm -f ${batFile}
+done

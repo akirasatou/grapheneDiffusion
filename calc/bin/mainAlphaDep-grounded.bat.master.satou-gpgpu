@@ -1,0 +1,13 @@
+#!/bin/bash
+
+alphaTab="1 2 5 10"
+
+for alpha in ${alphaTab}; do
+    batFile="mainAlphaDep-grounded-alpha=${alpha}.bat"
+    cp -f mainAlphaDep-grounded.bat.satou-gpgpu ${batFile}
+    
+    sed -e "s/alphaDummy/${alpha}/" ${batFile} > ${batFile}.tmp
+    mv -f ${batFile}.tmp ${batFile}
+    qsub ${batFile}
+    rm -f ${batFile}
+done

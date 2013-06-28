@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#PBS -e mainVgWgLgDep-grounded.err
-#PBS -o mainVgWgLgDep-grounded.out
+#PBS -e mainSS-grounded.err
+#PBS -o mainSS-grounded.out
 #PBS -q dque
 #PBS -l nodes=1:ppn=1
 cd $PBS_O_WORKDIR
@@ -13,25 +13,18 @@ source /opt/intel/bin/iccvars.sh intel64
 # extraction of parameters.
 
 Vg=VgDummy
-Wg=WgDummy
-Lg=LgDummy
-L=LDummy
-
 VgString="*(1-tanh((t+1e-18)\/1e-20))\/2"
-
-Wu1=`expr ${Wg} \* 2`
-Wd1=${Wg}
 
 
 # generate dif and poi files.
 
-exeFile=mainVgWgLgDep-grounded
+exeFile=mainSS-grounded
 difOrgFileNoExt=${exeFile}
 poiOrgFileNoExt=${exeFile}
 difOrgFile=${difOrgFileNoExt}.dif
 poiOrgFile=${poiOrgFileNoExt}.poi
-difNewFileNoExt="${exeFile}-Vg=${Vg}-Wg=${Wg}-Lg=${Lg}-L=${L}.dif"
-poiNewFileNoExt="${exeFile}-Vg=${Vg}-Wg=${Wg}-Lg=${Lg}-L=${L}.poi"
+difNewFileNoExt="${exeFile}-Vg=${Vg}.dif"
+poiNewFileNoExt="${exeFile}-Vg=${Vg}.poi"
 difNewFile=${difNewFileNoExt}.dif
 poiNewFile=${poiNewFileNoExt}.poi
 
@@ -40,26 +33,6 @@ poiNewFile=${poiNewFileNoExt}.poi
 
 cp -f ${poiOrgFile} ${poiNewFile}
 cp -f ${difOrgFile} ${difNewFile}
-
-sed -e "s/Lc.*/Lc ${L}/" ${difNewFile} > ${difNewFile}.tmp
-mv -f ${difNewFile}.tmp ${difNewFile}
-
-sed -e "s/L .*/L ${L}/" ${poiNewFile} > ${poiNewFile}.tmp
-mv -f ${poiNewFile}.tmp ${poiNewFile}
-
-sed -e "s/Wg.*/Wg ${Wg}/" ${poiNewFile} > ${poiNewFile}.tmp
-mv -f ${poiNewFile}.tmp ${poiNewFile}
-
-sed -e "s/Wu1.*/Wu1 ${Wu1}/" -e "s/Wd1.*/Wd1 ${Wd1}/" ${poiNewFile} > ${poiNewFile}.tmp
-mv -f ${poiNewFile}.tmp ${poiNewFile}
-
-sed -e "s/Lg.*/Lg ${Lg}/" ${poiNewFile} > ${poiNewFile}.tmp
-mv -f ${poiNewFile}.tmp ${poiNewFile}
-
-sg=`expr \( ${L} - 2 \* ${Lg} \) / 2`
-
-sed -e "s/sg.*/sg ${sg}/" ${poiNewFile} > ${poiNewFile}.tmp
-mv -f ${poiNewFile}.tmp ${poiNewFile}
 
 sed -e "s/Vg.*/Vg ${Vg}${VgString} -${Vg}${VgString}/" ${poiNewFile} > ${poiNewFile}.tmp
 mv -f ${poiNewFile}.tmp ${poiNewFile}

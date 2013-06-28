@@ -6,7 +6,7 @@ outputMu()
 {
 
 alpha=$1
-MAINDIR=../dat/alphaDep-grounded/alpha=${alpha}/Vg=100
+MAINDIR=../dat/alphaDep-grounded/alpha=${alpha}/Vg=200
 MUDIR=${MAINDIR}/mu
 
 OUTPUT=${MUDIR}/mu-e.dat
@@ -16,6 +16,7 @@ if ( test -e ${OUTPUT} ); then
 fi
 
 timemax=100000
+x="5e-06"
 
 for file in `ls ${MUDIR}` ; do
     suf=`echo ${file} | cut -d "-" -f 4 | sed -e "s/.dat$//g"`
@@ -30,7 +31,7 @@ for file in `ls ${MUDIR}` ; do
 	break
     fi
 
-    eval "awk '\$1==\"3.75e-06\" {print ${time} \" \" \$2}' ${MUDIR}/${file}" >> ${OUTPUT}
+    eval "awk '\$1==\"${x}\" {print ${time} \" \" \$2}' ${MUDIR}/${file}" >> ${OUTPUT}
 done
 }
 
@@ -40,4 +41,4 @@ done
 outputMu 1
 outputMu 2
 outputMu 5
-#outputMu 10
+outputMu 10

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+#PBS -e mainTimeDep-grounded.err
+#PBS -o mainTimeDep-grounded.out
+#PBS -q dque
+#PBS -l nodes=1:ppn=1
+cd $PBS_O_WORKDIR
+
+source /opt/intel/bin/compilervars.sh intel64
+source /opt/intel/bin/iccvars.sh intel64
+
+exeFile=mainTimeDep-grounded
+difFileNoExt=${exeFile}
+poiFileNoExt=${exeFile}
+difFile=${difFileNoExt}.dif
+poiFile=${poiFileNoExt}.poi
+
+~/lib/resutils/bin/geo2msh ${poiFileNoExt}
+
+mpirun ./${exeFile} ${poiFileNoExt} ${difFileNoExt} -ksp_type preonly -pc_type lu -pc_factor_zeropivot 0
