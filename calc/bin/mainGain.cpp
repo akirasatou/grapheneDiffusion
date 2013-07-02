@@ -13,7 +13,7 @@ double sigma_inter(double E, double mu, double T)
   return e*e/(4*pi*eps0*4*hbar)*(1-2*f);
 }
 
-Complex calc_kw(double f, double d, double epsilon, double mu, 
+Complex calc_kw(double f, double d, Complex epsilon, double mu, 
 		double T)
 {
   double w = 2*pi*f;
@@ -31,51 +31,54 @@ Complex calc_kw(double f, double d, double epsilon, double mu,
 
 int main()
 {
-  const double epsilon = 4;
+  const double nTab[3] = {2, 2, 2};
+  const double kappaTab[3] = {1e-3, 1e-3, 1e-3};
+  //const double kappaTab[3] = {1e-2, 1e-2, 1e-2};
   const double lambdaTab[3] = {micro2m(12), micro2m(15), micro2m(30)};
-  const double WgBeginTab[3] = {nm2m(1400), nm2m(1800), nm2m(3500)};
-  const double WgEndTab[3] = {nm2m(1600), nm2m(2000), nm2m(4000)};
+  const double WgBeginTab[3] = {nm2m(1490), nm2m(1860), nm2m(3740)};
+  const double WgEndTab[3] = {nm2m(1540), nm2m(1940), nm2m(3840)};
+  const double muTab[3]  {meV2J(70), meV2J(60), meV2J(40)};
   const double TTab[2] = {77, 300};
 
   // Wg dep.
 
   for(int i=0; i<3; i++){
     double lambda = lambdaTab[i];
+    double n = nTab[i], kappa = kappaTab[i];
+    Complex epsilon = Complex(n*n-kappa*kappa, 2*n*kappa);
+    double mu = muTab[i];
+
     double f = c/lambda;
 
     for(int j=0; j<2; j++){
       double T = TTab[j];
 
-      for(int k=0; k<3; k++){
-	double mu = meV2J(40)+meV2J(10)*k;
+      FILE *fre, *fim;
+      char filename[1000];
 
-	FILE *fre, *fim;
-	char filename[1000];
-
-	sprintf(filename, "../dat/VgWgLgDep-grounded/kw-lambda=%g-mu=%g-T=%g.dat",
-		m2micro(lambda), J2meV(mu), T);
-	fre = fopen(filename, "w");
+      sprintf(filename, "../dat/gain/kw-lambda=%g-mu=%g-T=%g.dat",
+	      m2micro(lambda), J2meV(mu), T);
+      fre = fopen(filename, "w");
       
-	sprintf(filename, "../dat/VgWgLgDep-grounded/gw-lambda=%g-mu=%g-T=%g.dat",
-		m2micro(lambda), J2meV(mu), T);
-	fim = fopen(filename, "w");
+      sprintf(filename, "../dat/gain/gw-lambda=%g-mu=%g-T=%g.dat",
+	      m2micro(lambda), J2meV(mu), T);
+      fim = fopen(filename, "w");
       
-	double Wgb = WgBeginTab[i], Wge = WgEndTab[i];
-	double WgStep = (Wge-Wgb)/300;
+      double Wgb = WgBeginTab[i], Wge = WgEndTab[i];
+      double WgStep = (Wge-Wgb)/300;
       
 
-	for(double Wg=Wgb; Wg<=Wge+nm2m(0.1); Wg+=WgStep){
+      for(double Wg=Wgb; Wg<=Wge+nm2m(0.1); Wg+=WgStep){
 
 	
-	  Complex kw = calc_kw(f, Wg, epsilon, mu, T);
+	Complex kw = calc_kw(f, Wg, epsilon, mu, T);
 	
-	  fprintf(fre, "%g %g\n", m2micro(Wg), Re(kw)*1e-2);
-	  fprintf(fim, "%g %g\n", m2micro(Wg), -Im(kw)*1e-2);
-	}
-      
-	fclose(fre);
-	fclose(fim);
+	fprintf(fre, "%g %g\n", m2micro(Wg), Re(kw)*1e-2);
+	fprintf(fim, "%g %g\n", m2micro(Wg), -Im(kw)*1e-2);
       }
+      
+      fclose(fre);
+      fclose(fim);
     }
   }
 
@@ -86,6 +89,8 @@ int main()
 
   for(int i=0; i<3; i++){
     double lambda = lambdaTab[i];
+    double n = nTab[i], kappa = kappaTab[i];
+    Complex epsilon = Complex(n*n-kappa*kappa, 2*n*kappa);
     double f = c/lambda;
     double Wg = WgTab[i];
 
@@ -95,11 +100,11 @@ int main()
       FILE *fre, *fim;
       char filename[1000];
 
-      sprintf(filename, "../dat/VgWgLgDep-grounded/kw-lambda=%g-Wg=%g-T=%g.dat",
+      sprintf(filename, "../dat/gain/kw-lambda=%g-Wg=%g-T=%g.dat",
 	      m2micro(lambda), m2nm(Wg), T);
       fre = fopen(filename, "w");
       
-      sprintf(filename, "../dat/VgWgLgDep-grounded/gw-lambda=%g-Wg=%g-T=%g.dat",
+      sprintf(filename, "../dat/gain/gw-lambda=%g-Wg=%g-T=%g.dat",
 	      m2micro(lambda), m2nm(Wg), T);
       fim = fopen(filename, "w");
 
