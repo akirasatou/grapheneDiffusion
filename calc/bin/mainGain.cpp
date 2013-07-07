@@ -6,19 +6,19 @@
 
 using namespace std;
 
-double sigma_inter(double E, double mu, double T)
+double sigma_inter(double E, double mu, double T, int nGL)
 {
   double f = 1.0/(1.0+exp((E-mu)/(kB*T)));
 
-  return e*e/(4*pi*eps0*4*hbar)*(1-2*f);
+  return nGL*e*e/(4*pi*eps0*4*hbar)*(1-2*f);
 }
 
 Complex calc_kw(double f, double d, Complex epsilon, double mu, 
-		double T)
+		double T, int nGL)
 {
   double w = 2*pi*f;
   double wd_c = w*d/c;
-  double delta = 4.0*(sigma_inter(hbar*w/2, mu, T)/c)*wd_c;
+  double delta = 4.0*(sigma_inter(hbar*w/2, mu, T, nGL)/c)*wd_c;
   Complex a = 0.5*pi;
   Complex b = -I*2*pi*delta;
 
@@ -31,92 +31,109 @@ Complex calc_kw(double f, double d, Complex epsilon, double mu,
 
 int main()
 {
-  const double nTab[3] = {2, 2, 2};
-  const double kappaTab[3] = {1e-3, 1e-3, 1e-3};
-  //const double kappaTab[3] = {1e-2, 1e-2, 1e-2};
-  const double lambdaTab[3] = {micro2m(12), micro2m(15), micro2m(30)};
-  const double WgBeginTab[3] = {nm2m(1490), nm2m(1860), nm2m(3740)};
-  const double WgEndTab[3] = {nm2m(1540), nm2m(1940), nm2m(3840)};
-  const double muTab[3]  {meV2J(70), meV2J(60), meV2J(40)};
-  const double TTab[2] = {77, 300};
+  const int nKappa = 2, nLambda = 3, nT = 3, nnGL = 2;
+
+  const double lambdaTab[nLambda] = {micro2m(12), micro2m(15), micro2m(30)};
+  const double WgBeginTab[nLambda] = {nm2m(1500), nm2m(1880), nm2m(3750)};
+  const double WgEndTab[nLambda] = {nm2m(1550), nm2m(1940), nm2m(3850)};
+  const double muTab[nLambda] = {meV2J(70), meV2J(60), meV2J(40)};
+  const double TTab[nT] = {20, 77, 300};
+  const double kappaTab[nnGL][nKappa] = {{2e-3, 4e-3}, {9e-3, 2.5e-2}};
+  const int nGLTab[nnGL] = {1, 4};
+  const double n = 2.0;
+
 
   // Wg dep.
 
-  for(int i=0; i<3; i++){
-    double lambda = lambdaTab[i];
-    double n = nTab[i], kappa = kappaTab[i];
-    Complex epsilon = Complex(n*n-kappa*kappa, 2*n*kappa);
-    double mu = muTab[i];
+  for(int iLambda=0; iLambda<nLambda; iLambda++){
+    double lambda = lambdaTab[iLambda];
+    double mu = muTab[iLambda];
+    double Wgb = WgBeginTab[iLambda], Wge = WgEndTab[iLambda];
+    double WgStep = (Wge-Wgb)/300;
 
     double f = c/lambda;
 
-    for(int j=0; j<2; j++){
-      double T = TTab[j];
+    for(int iT=0; iT<nT; iT++){
+      double T = TTab[iT];
 
-      FILE *fre, *fim;
-      char filename[1000];
-
-      sprintf(filename, "../dat/gain/kw-lambda=%g-mu=%g-T=%g.dat",
-	      m2micro(lambda), J2meV(mu), T);
-      fre = fopen(filename, "w");
-      
-      sprintf(filename, "../dat/gain/gw-lambda=%g-mu=%g-T=%g.dat",
-	      m2micro(lambda), J2meV(mu), T);
-      fim = fopen(filename, "w");
-      
-      double Wgb = WgBeginTab[i], Wge = WgEndTab[i];
-      double WgStep = (Wge-Wgb)/300;
-      
-
-      for(double Wg=Wgb; Wg<=Wge+nm2m(0.1); Wg+=WgStep){
-
+      for(int inGL=0; inGL<nnGL; inGL++){
+	int nGL = nGLTab[inGL];
 	
-	Complex kw = calc_kw(f, Wg, epsilon, mu, T);
-	
-	fprintf(fre, "%g %g\n", m2micro(Wg), Re(kw)*1e-2);
-	fprintf(fim, "%g %g\n", m2micro(Wg), -Im(kw)*1e-2);
+	for(int iKappa=0; iKappa<nKappa; iKappa++){
+	  double kappa = kappaTab[inGL][iKappa];
+	  Complex epsilon = Complex(n*n-kappa*kappa, 2*n*kappa);
+
+	  FILE *fre, *fim;
+	  char filename[1000];
+	  
+	  /*
+	  sprintf(filename, "../dat/gain/kw-WgDep-lambda=%g-nGL=%d-kappa=%g-T=%g.dat",
+		  m2micro(lambda), nGL, kappa, T);
+	  fre = fopen(filename, "w");
+	  */
+
+	  sprintf(filename, "../dat/gain/gw-WgDep-lambda=%g-nGL=%d-kappa=%g-T=%g.dat",
+		  m2micro(lambda), nGL, kappa, T);
+	  fim = fopen(filename, "w");
+	  
+	  for(double Wg=Wgb; Wg<=Wge+nm2m(0.1); Wg+=WgStep){
+	    Complex kw = calc_kw(f, Wg, epsilon, mu, T, nGL);
+	    
+	    //fprintf(fre, "%g %g\n", m2micro(Wg), Re(kw)*1e-2);
+	    fprintf(fim, "%g %g\n", m2micro(Wg), -Im(kw)*1e-2);
+	  }
+	  
+	  //fclose(fre);
+	  fclose(fim);
+	}
       }
-      
-      fclose(fre);
-      fclose(fim);
     }
   }
 
 
   // mu dep.
 
-  const double WgTab[3] = {nm2m(1510), nm2m(1890), nm2m(3780)};
+  const double WgTab[nLambda] = {nm2m(1510), nm2m(1890), nm2m(3780)};
 
-  for(int i=0; i<3; i++){
-    double lambda = lambdaTab[i];
-    double n = nTab[i], kappa = kappaTab[i];
-    Complex epsilon = Complex(n*n-kappa*kappa, 2*n*kappa);
+  for(int iLambda=0; iLambda<nLambda; iLambda++){
+    double lambda = lambdaTab[iLambda];
+    double Wg = WgTab[iLambda];
     double f = c/lambda;
-    double Wg = WgTab[i];
 
-    for(int j=0; j<2; j++){
-      double T = TTab[j];
+    for(int iT=0; iT<nT; iT++){
+      double T = TTab[iT];
 
-      FILE *fre, *fim;
-      char filename[1000];
-
-      sprintf(filename, "../dat/gain/kw-lambda=%g-Wg=%g-T=%g.dat",
-	      m2micro(lambda), m2nm(Wg), T);
-      fre = fopen(filename, "w");
-      
-      sprintf(filename, "../dat/gain/gw-lambda=%g-Wg=%g-T=%g.dat",
-	      m2micro(lambda), m2nm(Wg), T);
-      fim = fopen(filename, "w");
-
-      for(double mu=meV2J(20); mu<=meV2J(80); mu+=meV2J(0.1)){
-	Complex kw = calc_kw(f, Wg, epsilon, mu, T);
+      for(int inGL=0; inGL<nnGL; inGL++){
+	int nGL = nGLTab[inGL];
 	
-	fprintf(fre, "%g %g\n", J2meV(mu), Re(kw)*1e-2);
-	fprintf(fim, "%g %g\n", J2meV(mu), -Im(kw)*1e-2);
+	for(int iKappa=0; iKappa<nKappa; iKappa++){
+	  double kappa = kappaTab[inGL][iKappa];
+	  Complex epsilon = Complex(n*n-kappa*kappa, 2*n*kappa);
+
+	  FILE *fre, *fim;
+	  char filename[1000];
+	  
+	  /*
+	  sprintf(filename, "../dat/gain/kw-muDep-lambda=%g-nGL=%d-kappa=%g-T=%g.dat",
+		  m2micro(lambda), nGL, kappa, T);
+	  fre = fopen(filename, "w");
+	  */
+
+	  sprintf(filename, "../dat/gain/gw-muDep-lambda=%g-nGL=%d-kappa=%g-T=%g.dat",
+		  m2micro(lambda), nGL, kappa, T);
+	  fim = fopen(filename, "w");
+	  
+	  for(double mu=meV2J(20); mu<=meV2J(80); mu+=meV2J(0.1)){
+	    Complex kw = calc_kw(f, Wg, epsilon, mu, T, nGL);
+	    
+	    //fprintf(fre, "%g %g\n", J2meV(mu), Re(kw)*1e-2);
+	    fprintf(fim, "%g %g\n", J2meV(mu), -Im(kw)*1e-2);
+	  }
+	  
+	  //fclose(fre);
+	  fclose(fim);
+	}
       }
-      
-      fclose(fre);
-      fclose(fim);
     }
   }
 
