@@ -2,23 +2,19 @@
 #include <math.h>
 #include <PhysicalConstants.h>
 #include <PhysicalUnits.h>
+#include <Graphene/Constants.h>
 #include <Complex/Complex.h>
+#include "Conductivity.h"
 
 using namespace std;
 
-double sigma_inter(double E, double mu, double T, int nGL)
-{
-  double f = 1.0/(1.0+exp((E-mu)/(kB*T)));
-
-  return nGL*e*e/(4*pi*eps0*4*hbar)*(1-2*f);
-}
 
 Complex calc_kw(double f, double d, Complex epsilon, double mu, 
-		double T, int nGL)
+		double T, double v_tau, int nGL)
 {
   double w = 2*pi*f;
   double wd_c = w*d/c;
-  double delta = 4.0*(sigma_inter(hbar*w/2, mu, T, nGL)/c)*wd_c;
+  double delta = 4.0*(sigma_inter(hbar*w, mu, T, v_tau, nGL)/c)*wd_c;
   Complex a = 0.5*pi;
   Complex b = -I*2*pi*delta;
 
@@ -41,6 +37,7 @@ int main()
   const double kappaTab[nnGL][nKappa] = {{2e-3, 4e-3}, {9e-3, 2.5e-2}};
   const int nGLTab[nnGL] = {1, 4};
   const double n = 2.0;
+  const v_tau = 0.1*vF;
 
 
   // Wg dep.
@@ -77,7 +74,7 @@ int main()
 	  fim = fopen(filename, "w");
 	  
 	  for(double Wg=Wgb; Wg<=Wge+nm2m(0.1); Wg+=WgStep){
-	    Complex kw = calc_kw(f, Wg, epsilon, mu, T, nGL);
+	    Complex kw = calc_kw(f, Wg, epsilon, mu, T, v_tau, nGL);
 	    
 	    //fprintf(fre, "%g %g\n", m2micro(Wg), Re(kw)*1e-2);
 	    fprintf(fim, "%g %g\n", m2micro(Wg), -Im(kw)*1e-2);
@@ -124,7 +121,7 @@ int main()
 	  fim = fopen(filename, "w");
 	  
 	  for(double mu=meV2J(20); mu<=meV2J(80); mu+=meV2J(0.1)){
-	    Complex kw = calc_kw(f, Wg, epsilon, mu, T, nGL);
+	    Complex kw = calc_kw(f, Wg, epsilon, mu, T, v_tau, nGL);
 	    
 	    //fprintf(fre, "%g %g\n", J2meV(mu), Re(kw)*1e-2);
 	    fprintf(fim, "%g %g\n", J2meV(mu), -Im(kw)*1e-2);
