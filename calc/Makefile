@@ -79,5 +79,8 @@ mainGain-VgDep-grounded:  ${OBJS_WOMAIN} bin/mainGain-VgDep-grounded.o
 testTR:  ${OBJS_WOMAIN} bin/testTR.o
 	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
 
+test:  ${OBJS_WOMAIN} bin/test.o
+	${CXX} -o bin/$@ bin/$@.o ${OBJS_WOMAIN} ${CXXLDFLAGS}
+
 clean:
 	rm -f ${OBJS_WOMAIN} ${OBJS_MAIN} *~ src/*~ bin/*~ include/*~ bin/*.o
