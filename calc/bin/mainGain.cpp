@@ -14,7 +14,8 @@ Complex calc_kw(double f, double d, Complex epsilon, double mu,
 {
   double w = 2*pi*f;
   double wd_c = w*d/c;
-  double delta = 4.0*(sigma_inter(hbar*w, mu, T, v_tau, nGL)/c)*wd_c;
+  Complex delta = 4.0*(nGL*sigma_qe_taup(hbar*w, mu, T, v_tau)/c)*wd_c;
+  //Complex delta = 4.0*(nGL*sigma_inter_qe(hbar*w, mu, T)/c)*wd_c;
   Complex a = 0.5*pi;
   Complex b = -I*2*pi*delta;
 
@@ -37,7 +38,7 @@ int main()
   const double kappaTab[nnGL][nKappa] = {{2e-3, 4e-3}, {9e-3, 2.5e-2}};
   const int nGLTab[nnGL] = {1, 4};
   const double n = 2.0;
-  const v_tau = 0.1*vF;
+  const double v_tau = 0.1*vF;
 
 
   // Wg dep.

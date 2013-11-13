@@ -18,7 +18,7 @@ Complex sigma_qe_taup(double hw, double epsf, double Te, double v_tau){
 double sigma_inter_qe(double hw, double epsf, double Te){
   double f = 1/(exp((hw/2-epsf)/(kB*Te))+1);
 
-  return e*e/(4*hbar)*(1-2*f);
+  return e*e/((4*pi*eps0)*4*hbar)*(1-2*f);
 }
 
 double _integrand(double x, double x0){
@@ -34,7 +34,7 @@ Complex sigma_intra_qe(double hw, double epsf, double Te, double tau_m){
   r = integrate(_integrand, 0.0, x0+20, x0);
   //r = log(1+exp(x0));
   //r *= 2*e*e*kB*Te/(pi*hbar*hbar)*tau_m/(1+tau_m*tau_m*hw*hw/hbar/hbar);
-  r *= 2*e*e*kB*Te/(pi*hbar*hbar)/(1-I*tau_m*hw/hbar);
+  r *= 2*e*e*kB*Te/((4*pi*eps0)*pi*hbar*hbar)/(1-I*tau_m*hw/hbar);
 
   return r;
 }
@@ -62,7 +62,7 @@ Complex sigma_intra_qe_taup(double hw, double epsf, double Te, double v_tau){
 
   r = integrate(_integrand2, 0.0, x0+20, x0, a);
   r += I*integrate(_integrand3, 0.0, x0+20, x0, a);
-  r *= b*2*e*e*kB*Te/(pi*hbar*hbar);
+  r *= b*2*e*e*kB*Te/((4*pi*eps0)*pi*hbar*hbar);
 
   return r;
 }
