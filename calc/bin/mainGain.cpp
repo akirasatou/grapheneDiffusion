@@ -41,6 +41,41 @@ int main()
   const double v_tau = 0.1*vF;
 
 
+  // Conductivity
+  
+  for(int iLambda=0; iLambda<nLambda; iLambda++){
+    double mu = muTab[iLambda];
+
+    for(int iT=0; iT<nT; iT++){
+      double T = TTab[iT];
+
+
+      FILE *fre, *fim;
+      char filename[1000];
+	  
+      sprintf(filename, "../dat/gain/sigma-re-mu=%g-T=%g.dat",
+	      J2meV(mu), T);
+      fre = fopen(filename, "w");
+
+      sprintf(filename, "../dat/gain/sigma-im-mu=%g-T=%g.dat",
+	      J2meV(mu), T);
+      fim = fopen(filename, "w");
+
+      for(double f=THz2Hz(10); f<=THz2Hz(25); f+=THz2Hz(0.5)){
+	double w = 2*pi*f;
+	Complex sigma = sigma_intra_qe_taup(hbar*w, mu, T, v_tau);
+	double sigma0 = e*e/((4*pi*eps0)*4*hbar);
+
+	fprintf(fre, "%g %g\n", Hz2THz(f), Re(sigma)/sigma0);
+	fprintf(fim, "%g %g\n", Hz2THz(f), Im(sigma)/sigma0);
+      }
+
+      fclose(fre);
+      fclose(fim);
+    }
+  }
+
+
   // Wg dep.
 
   for(int iLambda=0; iLambda<nLambda; iLambda++){
@@ -64,11 +99,9 @@ int main()
 	  FILE *fre, *fim;
 	  char filename[1000];
 	  
-	  /*
 	  sprintf(filename, "../dat/gain/kw-WgDep-lambda=%g-nGL=%d-kappa=%g-T=%g.dat",
 		  m2micro(lambda), nGL, kappa, T);
 	  fre = fopen(filename, "w");
-	  */
 
 	  sprintf(filename, "../dat/gain/gw-WgDep-lambda=%g-nGL=%d-kappa=%g-T=%g.dat",
 		  m2micro(lambda), nGL, kappa, T);
@@ -77,11 +110,11 @@ int main()
 	  for(double Wg=Wgb; Wg<=Wge+nm2m(0.1); Wg+=WgStep){
 	    Complex kw = calc_kw(f, Wg, epsilon, mu, T, v_tau, nGL);
 	    
-	    //fprintf(fre, "%g %g\n", m2micro(Wg), Re(kw)*1e-2);
+	    fprintf(fre, "%g %g\n", m2micro(Wg), Re(kw)*1e-2);
 	    fprintf(fim, "%g %g\n", m2micro(Wg), -Im(kw)*1e-2);
 	  }
-	  
-	  //fclose(fre);
+	 
+	  fclose(fre);
 	  fclose(fim);
 	}
       }
@@ -111,11 +144,9 @@ int main()
 	  FILE *fre, *fim;
 	  char filename[1000];
 	  
-	  /*
 	  sprintf(filename, "../dat/gain/kw-muDep-lambda=%g-nGL=%d-kappa=%g-T=%g.dat",
 		  m2micro(lambda), nGL, kappa, T);
 	  fre = fopen(filename, "w");
-	  */
 
 	  sprintf(filename, "../dat/gain/gw-muDep-lambda=%g-nGL=%d-kappa=%g-T=%g.dat",
 		  m2micro(lambda), nGL, kappa, T);
@@ -124,11 +155,11 @@ int main()
 	  for(double mu=meV2J(20); mu<=meV2J(80); mu+=meV2J(0.1)){
 	    Complex kw = calc_kw(f, Wg, epsilon, mu, T, v_tau, nGL);
 	    
-	    //fprintf(fre, "%g %g\n", J2meV(mu), Re(kw)*1e-2);
+	    fprintf(fre, "%g %g\n", J2meV(mu), Re(kw)*1e-2);
 	    fprintf(fim, "%g %g\n", J2meV(mu), -Im(kw)*1e-2);
 	  }
 	  
-	  //fclose(fre);
+	  fclose(fre);
 	  fclose(fim);
 	}
       }
